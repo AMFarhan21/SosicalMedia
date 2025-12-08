@@ -4,8 +4,10 @@ import (
 	"log"
 	"socialmedia/app/echo-server/handler"
 	"socialmedia/app/echo-server/router"
+	"socialmedia/repositories/comments_repository"
 	"socialmedia/repositories/posts_repository"
 	"socialmedia/repositories/users_repository"
+	"socialmedia/service/comments_service"
 	"socialmedia/service/posts_service"
 	"socialmedia/service/users_service"
 	"socialmedia/utils/config"
@@ -28,10 +30,12 @@ func main() {
 	// repo
 	var userRepo users_service.UsersRepo
 	var postRepo posts_service.PostsRepo
+	var commentRepo comments_service.CommentsRepo
 	switch cfg.DBType {
 	case "GORM":
 		userRepo = users_repository.NewGormUsersRepository(db.Gorm)
 		postRepo = posts_repository.NewGormPostRepository(db.Gorm)
+		commentRepo = comments_repository.NewGormCommentsRepository(db.Gorm)
 	case "MONGO":
 		userRepo = users_repository.NewMongoUsersRepository(db.Mongo)
 		// postRepo = posts_repository.NewMongoPostRepository(db.Mongo)
@@ -43,14 +47,16 @@ func main() {
 	// service
 	userService := users_service.NewUsersService(userRepo, cfg.JwtSecret)
 	postService := posts_service.NewPostsService(postRepo)
+	commentService := comments_service.NewCommentsService(commentRepo)
 
 	// handler
 	userHandler := handler.NewUsersHandler(userService)
 	postHandler := handler.NewPostsHandler(postService)
+	commentHandler := handler.NewCommentsHandler(commentService)
 
 	e := echo.New()
 
-	router.Router(e, cfg, userHandler, postHandler)
+	router.Router(e, cfg, userHandler, postHandler, commentHandler)
 
 	log.Println("Successfully connected to the server")
 
