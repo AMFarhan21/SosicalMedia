@@ -39,7 +39,7 @@ func (r *GormPostRepository) GetAllPost(page, limit int) ([]domain.Posts, error)
 	return posts, nil
 }
 
-func (r *GormPostRepository) GetPostByID(id int) (domain.Posts, error) {
+func (r *GormPostRepository) GetPostByID(id int64) (domain.Posts, error) {
 	var post domain.Posts
 	err := r.DB.WithContext(r.ctx).Where("id=?", id).First(&post).Error
 	if err != nil {
@@ -62,7 +62,7 @@ func (r *GormPostRepository) UpdatePost(data domain.Posts) error {
 	return nil
 }
 
-func (r *GormPostRepository) DeletePost(id int, user_id string) error {
+func (r *GormPostRepository) DeletePost(id int64, user_id string) error {
 	row := r.DB.WithContext(r.ctx).Where("id=?", id).Where("user_id=?", user_id).Delete(domain.Posts{})
 	if err := row.Error; err != nil {
 		return err

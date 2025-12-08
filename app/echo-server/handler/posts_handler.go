@@ -95,7 +95,7 @@ func (h PostsHandler) GetAllPost(e echo.Context) error {
 func (h PostsHandler) GetPostByID(e echo.Context) error {
 	id := e.Param("id")
 	post_id, _ := strconv.Atoi(id)
-	post, err := h.postsService.GetPostByID(post_id)
+	post, err := h.postsService.GetPostByID(int64(post_id))
 	if err != nil {
 		if strings.Contains(err.Error(), "found") {
 			log.Printf("Error on GetPostByID request: %v", err.Error())
@@ -127,7 +127,7 @@ func (h PostsHandler) UpdatePost(e echo.Context) error {
 	}
 
 	err := h.postsService.UpdatePost(domain.Posts{
-		ID:       post_id,
+		ID:       int64(post_id),
 		UserID:   user_id,
 		Content:  request.Content,
 		ImageUrl: request.ImageUrl,
@@ -151,7 +151,7 @@ func (h PostsHandler) DeletePost(e echo.Context) error {
 	id := e.Param("id")
 	post_id, _ := strconv.Atoi(id)
 
-	err := h.postsService.DeletePost(post_id, user_id)
+	err := h.postsService.DeletePost(int64(post_id), user_id)
 	if err != nil {
 		if strings.Contains(err.Error(), "found") {
 			log.Printf("Error on GetPostByID request: %v", err.Error())

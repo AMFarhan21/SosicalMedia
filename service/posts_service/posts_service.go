@@ -12,9 +12,9 @@ type PostsService struct {
 type Service interface {
 	CreatePost(data domain.Posts) (domain.Posts, error)
 	GetAllPost(page, limit int) ([]domain.Posts, error)
-	GetPostByID(id int) (domain.Posts, error)
+	GetPostByID(id int64) (domain.Posts, error)
 	UpdatePost(data domain.Posts) error
-	DeletePost(id int, user_id string) error
+	DeletePost(id int64, user_id string) error
 }
 
 func NewPostsService(repo PostsRepo) Service {
@@ -33,13 +33,13 @@ func (s PostsService) CreatePost(data domain.Posts) (domain.Posts, error) {
 func (s PostsService) GetAllPost(page, limit int) ([]domain.Posts, error) {
 	return s.postsRepo.GetAllPost(page, limit)
 }
-func (s PostsService) GetPostByID(id int) (domain.Posts, error) {
+func (s PostsService) GetPostByID(id int64) (domain.Posts, error) {
 	return s.postsRepo.GetPostByID(id)
 }
 func (s PostsService) UpdatePost(data domain.Posts) error {
 	data.UpdatedAt = time.Now()
 	return s.postsRepo.UpdatePost(data)
 }
-func (s PostsService) DeletePost(id int, user_id string) error {
+func (s PostsService) DeletePost(id int64, user_id string) error {
 	return s.postsRepo.DeletePost(id, user_id)
 }

@@ -2,6 +2,7 @@ package posts_repository
 
 import (
 	"context"
+	"errors"
 	"socialmedia/domain"
 	"time"
 
@@ -23,7 +24,7 @@ func NewMongoPostsRepository(client *mongo.Client) *MongoPostsRepository {
 }
 
 func (r *MongoPostsRepository) CreatePost(data domain.Posts) (domain.Posts, error) {
-	data.ID = int(time.Now().UnixNano())
+	data.ID = int64(time.Now().UnixNano())
 	_, err := r.DB.InsertOne(r.ctx, data)
 	if err != nil {
 		return domain.Posts{}, err
@@ -38,5 +39,47 @@ func (r *MongoPostsRepository) GetAllPost(page, limit int) ([]domain.Posts, erro
 		return nil, err
 	}
 
-	var users []domain.Posts
+	var posts []domain.Posts
+	err = cursor.All(r.ctx, &posts)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (r *MongoPostsRepository) GetPostByID(id int64) (domain.Posts, error) {
+	var post domain.Posts
+	err := r.DB.FindOne(r.ctx, bson.M{"id": id}).Decode(&post)
+	if err != nil {
+		return domain.Posts{}, err
+	}
+
+	return post, nil
+}
+
+func (r *MongoPostsRepository) UpdatePost(data domain.Posts) error {
+	cursor, err := r.DB.UpdateOne(r.ctx, bson.M{"id": data.ID}, bson.M{"$set": data})
+	if err != nil {
+		return err
+	}
+
+	if cursor.ModifiedCount == 0 {
+		return errors.New("no rows affected, post doesnt exists")
+	}
+
+	return nil
+}
+
+func (r *MongoPostsRepository) DeletePost(id int64) error {
+	cursor, err := r.DB.DeleteOne(r.ctx, bson.M{"id": id})
+	if err != nil {
+		return err
+	}
+
+	if cursor.DeletedCount == 0 {
+		return errors.New("no rows affected, post doesnt exists")
+	}
+
+	return nil
 }
