@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react'
 export interface PostsWithUsername {
     id: number
     user_id: string
+    first_name: string
+    last_name: string
     username: string
     content: string
-    image_url: string
+    image_url: string[]
     created_at: string
     updated_at: string
-
 }
 
 const useGetAllPosts = () => {

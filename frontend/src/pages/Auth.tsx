@@ -1,38 +1,23 @@
 import { useState } from "react"
-import useLogin from "../hooks/useLogin"
-
+import xlogo from "../assets/x2.png"
+import Register from "../components/Register"
+import Login from "../components/Login"
 const Auth = () => {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const { login, loading, error } = useLogin()
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        login(email, password)
-    }
-
+    const [isLogin, setIsLogin] = useState(true)
 
     return (
-        <div className="w-full h-screen -mt-20 flex">
-            <div className="w-lg m-auto border rounded-2xl p-4 justify-center items-center">
-                <div className="text-center mb-4 font-bold text-2xl">Login</div>
-                <form className="space-y-2" onSubmit={handleSubmit}>
-                    <input placeholder="Email" type="email" onChange={(e) => setEmail(e.target.value)} className="w-full border rounded-lg px-4 py-2" />
-                    <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} className="w-full border rounded-lg px-4 py-2" />
-                    {
-                        error && (
-                            <div className="text-red-500 text-sm text-center">
-                                {error}
-                            </div>
-                        )
-                    }
-                    <button disabled={loading} type="submit" className="mx-auto flex bg-black text-white px-8 py-1 rounded-lg cursor-pointer hover:bg-gray-600">
-                        {
-                            loading ? "Loading..." : "Login"
-                        }
-                    </button>
-                </form>
+        <div className="w-full h-full flex absolute">
+            <div className="m-auto -mr-20">
+                <img src={xlogo} alt="App Logo" className='w-68' />
             </div>
+            {
+                isLogin ? (
+                    <Login setIsLogin={setIsLogin} />
+                ) : (
+                    <Register setIsLogin={setIsLogin} />
+                )
+            }
         </div>
     )
 }

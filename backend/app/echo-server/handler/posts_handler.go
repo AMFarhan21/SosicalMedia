@@ -20,13 +20,11 @@ type (
 	}
 
 	CreatePostInput struct {
-		Content  string `json:"content" bson:"content" validate:"required"`
-		ImageUrl string `json:"image_url" bson:"image_url"`
+		Content string `form:"content" validate:"required"`
 	}
 
 	UpdatePostInput struct {
-		Content  string `json:"content" bson:"content" validate:"required"`
-		ImageUrl string `json:"image_url" bson:"image_url"`
+		Content string `json:"content" bson:"content" validate:"required"`
 	}
 )
 
@@ -52,11 +50,18 @@ func (h PostsHandler) CreatePost(e echo.Context) error {
 		return e.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
+	form, err := e.MultipartForm()
+	if err != nil {
+		log.Printf("Error on multipartform on CreatePost: %v", err.Error())
+		return e.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
+	}
+
+	files := form.File["images"]
+
 	post, err := h.postsService.CreatePost(domain.Posts{
-		UserID:   user_id,
-		Content:  request.Content,
-		ImageUrl: request.ImageUrl,
-	})
+		UserID:  user_id,
+		Content: request.Content,
+	}, files)
 	if err != nil {
 		log.Printf("Error on CreatePost internal: %v", err.Error())
 		return e.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
@@ -124,10 +129,9 @@ func (h PostsHandler) UpdatePost(e echo.Context) error {
 	}
 
 	err := h.postsService.UpdatePost(domain.Posts{
-		ID:       int64(post_id),
-		UserID:   user_id,
-		Content:  request.Content,
-		ImageUrl: request.ImageUrl,
+		ID:      int64(post_id),
+		UserID:  user_id,
+		Content: request.Content,
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), "found") {

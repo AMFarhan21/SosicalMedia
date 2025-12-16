@@ -11,7 +11,7 @@ type CommentsService struct {
 
 type Service interface {
 	CreateComment(data domain.Comments) (domain.Comments, error)
-	GetAllComments(post_id int64) ([]domain.Comments, error)
+	GetAllComments(post_id int64) ([]domain.CommentsWithUsername, error)
 	GetCommentByID(id int64) (domain.Comments, error)
 	UpdateComment(data domain.Comments) error
 	DeleteComment(id int64, user_id string) error
@@ -30,7 +30,7 @@ func (s CommentsService) CreateComment(data domain.Comments) (domain.Comments, e
 
 	return s.commentsRepo.CreateComment(data)
 }
-func (s CommentsService) GetAllComments(post_id int64) ([]domain.Comments, error) {
+func (s CommentsService) GetAllComments(post_id int64) ([]domain.CommentsWithUsername, error) {
 	return s.commentsRepo.GetAllComments(post_id)
 }
 func (s CommentsService) GetCommentByID(id int64) (domain.Comments, error) {

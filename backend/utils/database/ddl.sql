@@ -35,8 +35,6 @@ create table likes (
     id serial primary key,
     user_id varchar(255) references users(id) not null,
     post_id int references posts(id),
-    comment_id int references comments(id),
-    created_at timestamp set default now(),
-    updated_at timestamp set default now()
+    comment_id int references comments(id)
 );
 

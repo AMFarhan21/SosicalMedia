@@ -1,0 +1,144 @@
+import { Ellipsis, SquarePen, Trash } from 'lucide-react'
+import { useState } from 'react'
+import useDeletePosts from '../hooks/useDeletePosts'
+import type { PostsWithUsername } from '../hooks/useGetAllPosts'
+import defaultProfile from '../assets/defaultProfile.jpg'
+import { IoChatbubbleOutline, IoHeartOutline, IoHeartSharp } from 'react-icons/io5'
+import { useNavigate } from 'react-router-dom'
+
+
+const Post = ({ post, setPosts, idxCondition, postCommentsPage, onPostComment, setImg }: { post: PostsWithUsername, setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>, idxCondition: boolean, postCommentsPage: () => void, onPostComment: boolean, setImg: React.Dispatch<React.SetStateAction<string>> }) => {
+    const [isLike, setIsLike] = useState(false)
+    const [isComment, setIsComment] = useState(false)
+    const [open, setOpen] = useState<number | null>(null)
+
+    const { deletePost, errorDelete } = useDeletePosts(setPosts)
+
+    const navigate = useNavigate()
+
+    return (
+        <>
+            <div onClick={postCommentsPage} className={`border-t p-4 sm:border-l sm:border-r ${idxCondition && "border-b"} border-white/22 cursor-pointer relative`} key={post.id}>
+                <div className='flex justify-between'>
+                    <div className='flex gap-2'>
+                        <img src={defaultProfile} alt="default" className='w-8 rounded-full' />
+                        <div className='flex gap-2 items-center'>
+                            <div className='font-bold'>
+                                {post?.first_name + " " + post?.last_name}
+                            </div>
+                            <div className='text-gray-400'>
+                                @{post?.username}
+                            </div>
+                            <div className='text-gray-400 text-xs'>
+                                {post.updated_at.split("T")[0]}
+                            </div>
+
+                        </div>
+                    </div>
+                    <button onClick={(e) => {
+                        e.stopPropagation()
+                        setOpen(prev => prev == post.id ? null : post.id)
+                    }} className='cursor-pointer hover:bg-gray-900 px-1 rounded-lg'>
+                        <Ellipsis />
+                    </button>
+                </div>
+
+                <div className='my-4'>
+                    {post.content}
+                </div>
+                <div className={`grid ${post.image_url && post.image_url.length > 1 ? "grid-cols-2" : "grid-cols-1"} gap-1`}>
+
+                    {
+                        post.image_url && post.image_url.map((image, index) => (
+                            <img onClick={(e) => {
+                                e.stopPropagation()
+                                setImg(image)
+                            }} key={index} className={`
+                            w-full 
+                             ${post.image_url.length == 4 && index == 0 ? "rounded-tl-lg" : post.image_url.length == 4 && index == 1 ? "rounded-tr-lg" : post.image_url.length == 4 && index == 2 ? "rounded-bl-lg" : post.image_url.length == 4 && index == 3 && "rounded-br-lg"} 
+                             ${post.image_url.length == 3 && index == 0 ? "h-full sm:h-full row-span-2 rounded-l-lg" : post.image_url.length == 3 && index == 1 ? "rounded-tr-lg" : post.image_url.length == 3 && index == 2 && "rounded-br-lg"}
+                             ${post.image_url.length == 2 && index == 0 ? "rounded-l-lg" : post.image_url.length == 2 && index == 1 && "rounded-r-lg"}
+                             ${post.image_url.length == 1 ? "h-full rounded-lg" : "h-40 sm:h-60"} 
+                                object-cover
+                            `}
+                                src={`http://localhost:8000/${image}`}
+                            />
+                        ))
+                    }
+                </div>
+
+                <div className='flex justify-around space-x-4 mt-2'>
+                    <button onClick={() => setIsComment(!isComment)} className='cursor-pointer gap-1'>
+                        <div className='flex gap-1 hover:text-blue-400 text-xs duration-200 items-center'>
+                            <div className='hover:bg-blue-300/20 rounded-full p-2 duration-200'>
+                                <IoChatbubbleOutline className='w-4 h-4' />
+                            </div>
+                            <span className='-ml-1'>
+                                0
+                            </span>
+                        </div>
+                    </button>
+                    <button onClick={(e) => {
+                        e.stopPropagation()
+                        setIsLike(!isLike)
+                    }} className='cursor-pointer'>
+                        {
+                            isLike ? (
+                                <div className='flex gap-1 hover:text-pink-400 text-xs duration-200 items-center'>
+                                    <div className='hover:bg-pink-300/20 rounded-full p-2 duration-200'>
+                                        <IoHeartOutline className='w-4 h-4' />
+                                    </div>
+                                    <span className='-ml-1'>
+                                        0
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className='flex gap-1 hover:text-pink-400 text-xs duration-200 items-center'>
+                                    <div className='hover:bg-pink-300/20 rounded-full p-2 duration-200'>
+                                        <IoHeartSharp className='w-4 h-4 text-pink-600' />
+                                    </div>
+                                    <span className='-ml-1'>
+                                        0
+                                    </span>
+                                </div>
+                            )
+
+                        }
+                    </button>
+
+                </div>
+                {
+                    open == post.id && (
+                        <div className='bg-white border p-2 rounded-lg absolute right-0 top-10 -mr-10'>
+                            <button onClick={async (e) => {
+                                e.stopPropagation()
+                                const success = await deletePost(post.id)
+                                if (!success) {
+                                    alert(errorDelete)
+                                }
+
+                                if (onPostComment) {
+                                    navigate(-1)
+                                }
+                            }} className='flex gap-2 hover:bg-gray-200 px-2 rounded-sm w-full cursor-pointer text-red-500'>
+                                <Trash className='w-4' />
+                                <div>
+                                    delete
+                                </div>
+                            </button>
+                            <button className='flex gap-2 hover:bg-gray-200 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
+                                <SquarePen className='w-4' />
+                                <div>
+                                    edit
+                                </div>
+                            </button>
+                        </div>
+                    )
+                }
+            </div >
+        </>
+    )
+
+}
+
+export default Post

@@ -10,15 +10,19 @@ const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
 
     const token = sessionStorage.getItem("Token")
 
-    const createPost = async (content: string, image_url: string) => {
+    const createPost = async (content: string, files: File[]) => {
         try {
+            const formData = new FormData()
+            formData.append("content", content)
+            for (const file of files) {
+                formData.append("images", file)
+            }
             const resCreate = await fetch("http://localhost:8000/api/v1/posts", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ content, image_url })
+                body: formData
             })
 
             const resultCreate = await resCreate.json()

@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Router(e *echo.Echo, cfg *config.Config, userHandler *handler.UsersHandler, postHandler *handler.PostsHandler, commentHandler *handler.CommentsHandler) {
+func Router(e *echo.Echo, cfg *config.Config, userHandler *handler.UsersHandler, postHandler *handler.PostsHandler, commentHandler *handler.CommentsHandler, likesHandler *handler.LikesHandler) {
 	jwtMiddleware := middleware.JWTMiddleware(cfg.JwtSecret)
 	adminAccess := middleware.ACLMiddleware(map[string]bool{
 		"admin": true,
@@ -47,6 +47,9 @@ func Router(e *echo.Echo, cfg *config.Config, userHandler *handler.UsersHandler,
 	comments.GET("/:comment_id", commentHandler.GetCommentByID, userNAdminAccess)
 	comments.PUT("/:comment_id", commentHandler.UpdateComment, userNAdminAccess)
 	comments.DELETE("/:comment_id", commentHandler.DeleteComment, userNAdminAccess)
+
+	likes := api.Group("/likes", jwtMiddleware)
+	likes.POST("", likesHandler.Likes)
 }
 
 // func Router(e *echo.Echo, cfg *config.Config, userHandler *handler.UsersHandler, postHandler *handler.PostsHandler, commentHandler *handler.CommentsHandler) {

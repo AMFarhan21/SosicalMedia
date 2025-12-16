@@ -15,7 +15,7 @@ type GormCommentsRepository struct {
 
 func NewGormCommentsRepository(db *gorm.DB) *GormCommentsRepository {
 	return &GormCommentsRepository{
-		DB:  db,
+		DB:  db.Table("comments"),
 		ctx: context.Background(),
 	}
 }
@@ -29,9 +29,12 @@ func (r *GormCommentsRepository) CreateComment(data domain.Comments) (domain.Com
 	return data, nil
 }
 
-func (r *GormCommentsRepository) GetAllComments(post_id int64) ([]domain.Comments, error) {
-	var comments []domain.Comments
-	err := r.DB.WithContext(r.ctx).Order("created_at DESC").Where("post_id=?", post_id).Find(&comments).Error
+func (r *GormCommentsRepository) GetAllComments(post_id int64) ([]domain.CommentsWithUsername, error) {
+	var comments []domain.CommentsWithUsername
+	err := r.DB.WithContext(r.ctx).
+		Select("comments.id, comments.user_id, users.first_name, users.last_name, users.username, comments.content, comments.image_url, comments.created_at, comments.updated_at").
+		Joins("JOIN users on comments.user_id = users.id").
+		Order("created_at DESC").Where("post_id=?", post_id).Find(&comments).Error
 	if err != nil {
 		return nil, err
 	}

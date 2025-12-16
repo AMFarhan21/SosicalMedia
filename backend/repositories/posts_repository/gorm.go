@@ -2,6 +2,7 @@ package posts_repository
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"socialmedia/domain"
 
@@ -30,29 +31,63 @@ func (r *GormPostRepository) CreatePost(data domain.Posts) (domain.Posts, error)
 }
 
 func (r *GormPostRepository) GetAllPost(page, limit int) ([]domain.PostsWithUsername, error) {
-	var posts []domain.PostsWithUsername
+	var rows []domain.PostFromDB
 	err := r.DB.WithContext(r.ctx).
-		Select("posts.id, posts.user_id, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at").
+		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at").
 		Joins("JOIN users ON posts.user_id = users.id").
-		Order("posts.created_at DESC").Offset((page - 1) * limit).Limit(limit).Scan(&posts).Error
+		Order("posts.created_at DESC").Offset((page - 1) * limit).Limit(limit).Scan(&rows).Error
 	if err != nil {
 		return nil, err
+	}
+
+	var posts []domain.PostsWithUsername
+	for _, row := range rows {
+		var images []string
+		if row.ImageUrl != "" {
+			_ = json.Unmarshal([]byte(row.ImageUrl), &images)
+		}
+
+		posts = append(posts, domain.PostsWithUsername{
+			ID:        row.ID,
+			UserID:    row.UserID,
+			FirstName: row.Username,
+			LastName:  row.LastName,
+			Username:  row.Username,
+			Content:   row.Content,
+			ImageUrl:  images,
+			CreatedAt: row.CreatedAt,
+			UpdatedAt: row.UpdatedAt,
+		})
 	}
 
 	return posts, nil
 }
 
 func (r *GormPostRepository) GetPostByID(id int64) (domain.PostsWithUsername, error) {
-	var post domain.PostsWithUsername
+	var row domain.PostFromDB
 	err := r.DB.WithContext(r.ctx).
-		Select("posts.id, posts.user_id, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at").
+		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at").
 		Joins("JOIN users ON posts.user_id = users.id").
-		Where("posts.id=?", id).Scan(&post).Error
+		Where("posts.id=?", id).Scan(&row).Error
 	if err != nil {
 		return domain.PostsWithUsername{}, err
 	}
 
-	return post, nil
+	var imagesUrls []string
+
+	_ = json.Unmarshal([]byte(row.ImageUrl), &imagesUrls)
+
+	return domain.PostsWithUsername{
+		ID:        row.ID,
+		UserID:    row.UserID,
+		FirstName: row.FirstName,
+		LastName:  row.LastName,
+		Username:  row.Username,
+		Content:   row.Content,
+		ImageUrl:  imagesUrls,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+	}, nil
 }
 
 func (r *GormPostRepository) UpdatePost(data domain.Posts) error {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { PostsWithUsername } from './useGetAllPosts'
 
-const useDeletePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>) => {
+const useDeletePosts = (setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>) => {
     const [errorDelete, setError] = useState("")
 
     const token = sessionStorage.getItem("Token")
@@ -20,7 +20,9 @@ const useDeletePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
                 throw new Error(result.error)
             }
 
-            setPosts(prev => [...prev].filter((p) => p.id != id))
+            if (setPosts) {
+                setPosts(prev => [...prev].filter((p) => p.id != id))
+            }
             setError("")
             return result.success
         } catch (err) {
