@@ -12,25 +12,31 @@ type Posts struct {
 }
 
 type PostFromDB struct {
-	ID        int64     `json:"id" bson:"id" gorm:"primaryKey;autoIncrement"`
-	UserID    string    `json:"user_id" bson:"user_id"`
-	FirstName string    `json:"first_name" bson:"first_name"`
-	LastName  string    `json:"last_name" bson:"last_name"`
-	Username  string    `json:"username" bson:"username"`
-	Content   string    `json:"content" bson:"content"`
-	ImageUrl  string    `json:"image_url" bson:"image_url"`
-	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+	ID            int64     `json:"id" bson:"id" gorm:"primaryKey;autoIncrement"`
+	UserID        string    `json:"user_id" bson:"user_id"`
+	FirstName     string    `json:"first_name" bson:"first_name"`
+	LastName      string    `json:"last_name" bson:"last_name"`
+	Username      string    `json:"username" bson:"username"`
+	Content       string    `json:"content" bson:"content"`
+	ImageUrl      string    `json:"image_url" bson:"image_url"`
+	CreatedAt     time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at" bson:"updated_at"`
+	IsLiked       bool      `json:"is_liked" bson:"is_liked"`
+	LikesCount    int64     `json:"likes_count" bson:"likes_count"`
+	CommentsCount int64     `json:"comments_count" bson:"comments_count"`
 }
 
 type PostsWithUsername struct {
-	ID        int64     `json:"id" bson:"id" gorm:"primaryKey;autoIncrement"`
-	UserID    string    `json:"user_id" bson:"user_id"`
-	FirstName string    `json:"first_name" bson:"first_name"`
-	LastName  string    `json:"last_name" bson:"last_name"`
-	Username  string    `json:"username" bson:"username"`
-	Content   string    `json:"content" bson:"content"`
-	ImageUrl  []string  `json:"image_url" bson:"image_url"`
-	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+	ID            int64     `json:"id" bson:"id" gorm:"primaryKey;autoIncrement"`
+	UserID        string    `json:"user_id" bson:"user_id"`
+	FirstName     string    `json:"first_name" bson:"first_name"`
+	LastName      string    `json:"last_name" bson:"last_name"`
+	Username      string    `json:"username" bson:"username"`
+	Content       string    `json:"content" bson:"content"`
+	ImageUrl      []string  `json:"image_url" bson:"image_url"`
+	CreatedAt     time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at" bson:"updated_at"`
+	IsLiked       bool      `json:"is_liked" bson:"is_liked"`
+	LikesCount    int64     `json:"likes_count" bson:"likes_count"`
+	CommentsCount int64     `json:"comments_count" bson:"comments_count"`
 }

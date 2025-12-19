@@ -85,7 +85,9 @@ func (h PostsHandler) GetAllPost(e echo.Context) error {
 		limit = 10
 	}
 
-	posts, err := h.postsService.GetAllPost(page, limit)
+	user_id := e.Get("id").(string)
+
+	posts, err := h.postsService.GetAllPost(page, limit, user_id)
 	if err != nil {
 		log.Printf("Error on GetAllPost internal: %v", err.Error())
 		return e.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
@@ -97,7 +99,8 @@ func (h PostsHandler) GetAllPost(e echo.Context) error {
 func (h PostsHandler) GetPostByID(e echo.Context) error {
 	id := e.Param("id")
 	post_id, _ := strconv.Atoi(id)
-	post, err := h.postsService.GetPostByID(int64(post_id))
+	user_id := e.Get("id").(string)
+	post, err := h.postsService.GetPostByID(int64(post_id), user_id)
 	if err != nil {
 		if strings.Contains(err.Error(), "found") {
 			log.Printf("Error on GetPostByID request: %v", err.Error())

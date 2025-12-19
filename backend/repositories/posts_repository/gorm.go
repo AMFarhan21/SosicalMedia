@@ -30,10 +30,11 @@ func (r *GormPostRepository) CreatePost(data domain.Posts) (domain.Posts, error)
 	return data, nil
 }
 
-func (r *GormPostRepository) GetAllPost(page, limit int) ([]domain.PostsWithUsername, error) {
+func (r *GormPostRepository) GetAllPost(page, limit int, user_id string) ([]domain.PostsWithUsername, error) {
 	var rows []domain.PostFromDB
 	err := r.DB.WithContext(r.ctx).
-		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at").
+		// Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at, exists(select * from likes where likes.post_id = posts.id and likes.user_id = ?) as is_liked", user_id).
+		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at, exists(select 1 from likes where likes.post_id = posts.id and likes.user_id = ?) as is_liked, (select count(*) from likes where likes.post_id = posts.id) as likes_count, (select count(*) from comments where comments.post_id = posts.id) as comments_count", user_id).
 		Joins("JOIN users ON posts.user_id = users.id").
 		Order("posts.created_at DESC").Offset((page - 1) * limit).Limit(limit).Scan(&rows).Error
 	if err != nil {
@@ -48,25 +49,28 @@ func (r *GormPostRepository) GetAllPost(page, limit int) ([]domain.PostsWithUser
 		}
 
 		posts = append(posts, domain.PostsWithUsername{
-			ID:        row.ID,
-			UserID:    row.UserID,
-			FirstName: row.Username,
-			LastName:  row.LastName,
-			Username:  row.Username,
-			Content:   row.Content,
-			ImageUrl:  images,
-			CreatedAt: row.CreatedAt,
-			UpdatedAt: row.UpdatedAt,
+			ID:            row.ID,
+			UserID:        row.UserID,
+			FirstName:     row.Username,
+			LastName:      row.LastName,
+			Username:      row.Username,
+			Content:       row.Content,
+			ImageUrl:      images,
+			CreatedAt:     row.CreatedAt,
+			UpdatedAt:     row.UpdatedAt,
+			IsLiked:       row.IsLiked,
+			LikesCount:    row.LikesCount,
+			CommentsCount: row.CommentsCount,
 		})
 	}
 
 	return posts, nil
 }
 
-func (r *GormPostRepository) GetPostByID(id int64) (domain.PostsWithUsername, error) {
+func (r *GormPostRepository) GetPostByID(id int64, user_id string) (domain.PostsWithUsername, error) {
 	var row domain.PostFromDB
 	err := r.DB.WithContext(r.ctx).
-		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at").
+		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at, exists(select 1 from likes where likes.post_id = posts.id and likes.user_id = ?) as is_liked, (select count(*) from likes where likes.post_id = posts.id) as likes_count, (select count(*) from comments where comments.post_id = posts.id) as comments_count", user_id).
 		Joins("JOIN users ON posts.user_id = users.id").
 		Where("posts.id=?", id).Scan(&row).Error
 	if err != nil {
@@ -78,15 +82,18 @@ func (r *GormPostRepository) GetPostByID(id int64) (domain.PostsWithUsername, er
 	_ = json.Unmarshal([]byte(row.ImageUrl), &imagesUrls)
 
 	return domain.PostsWithUsername{
-		ID:        row.ID,
-		UserID:    row.UserID,
-		FirstName: row.FirstName,
-		LastName:  row.LastName,
-		Username:  row.Username,
-		Content:   row.Content,
-		ImageUrl:  imagesUrls,
-		CreatedAt: row.CreatedAt,
-		UpdatedAt: row.UpdatedAt,
+		ID:            row.ID,
+		UserID:        row.UserID,
+		FirstName:     row.FirstName,
+		LastName:      row.LastName,
+		Username:      row.Username,
+		Content:       row.Content,
+		ImageUrl:      imagesUrls,
+		CreatedAt:     row.CreatedAt,
+		UpdatedAt:     row.UpdatedAt,
+		IsLiked:       row.IsLiked,
+		LikesCount:    row.LikesCount,
+		CommentsCount: row.CommentsCount,
 	}, nil
 }
 

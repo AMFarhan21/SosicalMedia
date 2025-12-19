@@ -8,24 +8,40 @@ export interface CommentsWithUsername {
     last_name: string
     username: string
     content: string
-    image_url: string
+    image_url: string[]
     created_at: string
     updated_at: string
-
+    is_liked: boolean
+    likes_count: number
 }
 
 const useGetPostIDComments = (postID: number) => {
+    const initialPost: PostsWithUsername = {
+        id: 0,
+        user_id: "",
+        first_name: "",
+        last_name: "",
+        username: "",
+        content: "",
+        image_url: [],
+        created_at: "",
+        updated_at: "",
+        is_liked: false,
+        likes_count: 0,
+        comments_count: 0,
+    }
+
     const [error, setError] = useState("")
     const [comments, setComments] = useState<CommentsWithUsername[]>([])
-    const [post, setPost] = useState<PostsWithUsername | null>(null)
+    const [post, setPost] = useState<PostsWithUsername>(initialPost)
     const token = sessionStorage.getItem("Token")
-
+    const HOST = import.meta.env.VITE_API_HOST
 
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const res = await fetch(`http://localhost:8000/api/v1/posts/${postID}`, {
+                const res = await fetch(`${HOST}/api/v1/posts/${postID}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -48,7 +64,7 @@ const useGetPostIDComments = (postID: number) => {
         }
         const fetchComments = async () => {
             try {
-                const res = await fetch(`http://localhost:8000/api/v1/posts/${postID}/comments`, {
+                const res = await fetch(`${HOST}/api/v1/posts/${postID}/comments`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -77,7 +93,7 @@ const useGetPostIDComments = (postID: number) => {
 
 
 
-    return { post, comments, error }
+    return { post, setPost, comments, setComments, error }
 
 }
 

@@ -57,7 +57,7 @@ const Feed = () => {
                         ---------
                     </div>
                 </div>
-                <form onSubmit={handleCreatePost} className='sm:border-x border-white/22 relative cursor-pointer p-4 flex flex-col space-y-4'>
+                <form onSubmit={handleCreatePost} className={`sm:border-x ${posts.length == 0 && "border-b"} border-white/22 relative cursor-pointer p-4 flex flex-col space-y-4`}>
                     <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="What's happening?" className='border-none outline-none' rows={2} />
                     <label htmlFor='upload-image'>
                         <div className='p-2 w-8 -mb-6 cursor-pointer hover:bg-blue-400/20 rounded-full text-blue-400 duration-100'>

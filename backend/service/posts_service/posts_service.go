@@ -16,8 +16,8 @@ type PostsService struct {
 
 type Service interface {
 	CreatePost(data domain.Posts, files []*multipart.FileHeader) (domain.Posts, error)
-	GetAllPost(page, limit int) ([]domain.PostsWithUsername, error)
-	GetPostByID(id int64) (domain.PostsWithUsername, error)
+	GetAllPost(page, limit int, user_id string) ([]domain.PostsWithUsername, error)
+	GetPostByID(id int64, user_id string) (domain.PostsWithUsername, error)
 	UpdatePost(data domain.Posts) error
 	DeletePost(id int64, user_id string) error
 }
@@ -64,11 +64,11 @@ func (s PostsService) CreatePost(data domain.Posts, files []*multipart.FileHeade
 
 	return s.postsRepo.CreatePost(data)
 }
-func (s PostsService) GetAllPost(page, limit int) ([]domain.PostsWithUsername, error) {
-	return s.postsRepo.GetAllPost(page, limit)
+func (s PostsService) GetAllPost(page, limit int, user_id string) ([]domain.PostsWithUsername, error) {
+	return s.postsRepo.GetAllPost(page, limit, user_id)
 }
-func (s PostsService) GetPostByID(id int64) (domain.PostsWithUsername, error) {
-	return s.postsRepo.GetPostByID(id)
+func (s PostsService) GetPostByID(id int64, user_id string) (domain.PostsWithUsername, error) {
+	return s.postsRepo.GetPostByID(id, user_id)
 }
 func (s PostsService) UpdatePost(data domain.Posts) error {
 	data.UpdatedAt = time.Now()

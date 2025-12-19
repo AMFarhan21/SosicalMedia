@@ -10,6 +10,9 @@ export interface PostsWithUsername {
     image_url: string[]
     created_at: string
     updated_at: string
+    is_liked: boolean
+    likes_count: number
+    comments_count: number
 }
 
 const useGetAllPosts = () => {

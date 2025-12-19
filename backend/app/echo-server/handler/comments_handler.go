@@ -20,13 +20,11 @@ type (
 	}
 
 	CreateCommentInput struct {
-		Content  string `json:"content" bson:"content" validate:"required"`
-		ImageUrl string `json:"image_url" bson:"image_url"`
+		Content string `form:"content" validate:"required"`
 	}
 
 	UpdateCommentInput struct {
-		Content  string `json:"content" bson:"content" validate:"required"`
-		ImageUrl string `json:"image_url" bson:"image_url"`
+		Content string `json:"content" bson:"content" validate:"required"`
 	}
 )
 
@@ -54,12 +52,19 @@ func (h CommentsHandler) CreateComment(e echo.Context) error {
 		return e.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
 	}
 
+	form, err := e.MultipartForm()
+	if err != nil {
+		log.Printf("Error on CreateComment multipartform: %v", err.Error())
+		return e.JSON(http.StatusBadRequest, fres.Response.StatusBadRequest(err.Error()))
+	}
+
+	files := form.File["images"]
+
 	post, err := h.commentsService.CreateComment(domain.Comments{
-		UserID:   user_id,
-		PostID:   int64(post_id),
-		Content:  request.Content,
-		ImageUrl: request.ImageUrl,
-	})
+		UserID:  user_id,
+		PostID:  int64(post_id),
+		Content: request.Content,
+	}, files)
 	if err != nil {
 		log.Printf("Error on CreateComment internal: %v", err.Error())
 		return e.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
@@ -71,8 +76,9 @@ func (h CommentsHandler) CreateComment(e echo.Context) error {
 func (h CommentsHandler) GetAllComments(e echo.Context) error {
 	id := e.Param("id")
 	post_id, _ := strconv.Atoi(id)
+	user_id := e.Get("id").(string)
 
-	comments, err := h.commentsService.GetAllComments(int64(post_id))
+	comments, err := h.commentsService.GetAllComments(int64(post_id), user_id)
 	if err != nil {
 		log.Printf("Error on GetAllComments internal: %v", err.Error())
 		return e.JSON(http.StatusInternalServerError, fres.Response.StatusInternalServerError(http.StatusInternalServerError))
@@ -120,11 +126,10 @@ func (h CommentsHandler) UpdateComment(e echo.Context) error {
 	}
 
 	err := h.commentsService.UpdateComment(domain.Comments{
-		ID:       int64(comment_id),
-		UserID:   user_id,
-		PostID:   int64(post_id),
-		Content:  request.Content,
-		ImageUrl: request.ImageUrl,
+		ID:      int64(comment_id),
+		UserID:  user_id,
+		PostID:  int64(post_id),
+		Content: request.Content,
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows") || strings.Contains(err.Error(), "found") {

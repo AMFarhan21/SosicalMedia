@@ -5,14 +5,16 @@ import type { PostsWithUsername } from '../hooks/useGetAllPosts'
 import defaultProfile from '../assets/defaultProfile.jpg'
 import { IoChatbubbleOutline, IoHeartOutline, IoHeartSharp } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
+import useLikes from '../hooks/useLikes'
 
 
-const Post = ({ post, setPosts, idxCondition, postCommentsPage, onPostComment, setImg }: { post: PostsWithUsername, setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>, idxCondition: boolean, postCommentsPage: () => void, onPostComment: boolean, setImg: React.Dispatch<React.SetStateAction<string>> }) => {
+const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostComment, setImg }: { post: PostsWithUsername, setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>, setPost?: React.Dispatch<React.SetStateAction<PostsWithUsername>>, idxCondition: boolean, postCommentsPage: () => void, onPostComment: boolean, setImg: React.Dispatch<React.SetStateAction<string>> }) => {
     const [isLike, setIsLike] = useState(false)
     const [isComment, setIsComment] = useState(false)
     const [open, setOpen] = useState<number | null>(null)
-
+    const HOST = import.meta.env.VITE_API_HOST;
     const { deletePost, errorDelete } = useDeletePosts(setPosts)
+    const { likes } = useLikes({ setPosts, setPost })
 
     const navigate = useNavigate()
 
@@ -61,7 +63,7 @@ const Post = ({ post, setPosts, idxCondition, postCommentsPage, onPostComment, s
                              ${post.image_url.length == 1 ? "h-full rounded-lg" : "h-40 sm:h-60"} 
                                 object-cover
                             `}
-                                src={`http://localhost:8000/${image}`}
+                                src={`${HOST}/${image}`}
                             />
                         ))
                     }
@@ -74,7 +76,7 @@ const Post = ({ post, setPosts, idxCondition, postCommentsPage, onPostComment, s
                                 <IoChatbubbleOutline className='w-4 h-4' />
                             </div>
                             <span className='-ml-1'>
-                                0
+                                {post.comments_count}
                             </span>
                         </div>
                     </button>
@@ -82,28 +84,14 @@ const Post = ({ post, setPosts, idxCondition, postCommentsPage, onPostComment, s
                         e.stopPropagation()
                         setIsLike(!isLike)
                     }} className='cursor-pointer'>
-                        {
-                            isLike ? (
-                                <div className='flex gap-1 hover:text-pink-400 text-xs duration-200 items-center'>
-                                    <div className='hover:bg-pink-300/20 rounded-full p-2 duration-200'>
-                                        <IoHeartOutline className='w-4 h-4' />
-                                    </div>
-                                    <span className='-ml-1'>
-                                        0
-                                    </span>
-                                </div>
-                            ) : (
-                                <div className='flex gap-1 hover:text-pink-400 text-xs duration-200 items-center'>
-                                    <div className='hover:bg-pink-300/20 rounded-full p-2 duration-200'>
-                                        <IoHeartSharp className='w-4 h-4 text-pink-600' />
-                                    </div>
-                                    <span className='-ml-1'>
-                                        0
-                                    </span>
-                                </div>
-                            )
-
-                        }
+                        <div className='flex gap-1 hover:text-pink-400 text-xs duration-200 items-center'>
+                            <button onClick={() => likes(post.id, "POST")} className='hover:bg-pink-300/20 rounded-full p-2 duration-200 cursor-pointer'>
+                                {post.is_liked ? <IoHeartSharp className='w-4 h-4 text-pink-600' /> : <IoHeartOutline className='w-4 h-4' />}
+                            </button>
+                            <span className='-ml-1'>
+                                {post.likes_count}
+                            </span>
+                        </div>
                     </button>
 
                 </div>
