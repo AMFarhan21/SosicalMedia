@@ -83,6 +83,8 @@ func main() {
 	c := cron.New()
 
 	router.Router(e, c, cfg, userHandler, postHandler, commentHandler, likesHandler)
+	c.Start()
+	defer c.Stop()
 
 	log.Println("Successfully connected to the server")
 
