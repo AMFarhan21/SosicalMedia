@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"socialmedia/domain"
@@ -72,7 +73,7 @@ func (s PostsService) CreatePost(data domain.Posts, files []*multipart.FileHeade
 
 	err = s.redisRepo.DeleteFeed()
 	if err != nil {
-		return domain.Posts{}, err
+		log.Print("Error on redis DeleteFeed()", err.Error())
 	}
 
 	return post, nil
@@ -111,7 +112,7 @@ func (s PostsService) UpdatePost(data domain.Posts) error {
 func (s PostsService) DeletePost(id int64, user_id string) error {
 	err := s.redisRepo.DeleteFeed()
 	if err != nil {
-		return err
+		log.Print("Error on redis DeleteFeed()", err.Error())
 	}
 
 	return s.postsRepo.DeletePost(id, user_id)
