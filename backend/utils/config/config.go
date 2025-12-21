@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -14,7 +15,7 @@ type Config struct {
 	DBType          string
 	Port            string
 	JwtSecret       string
-	RedisHost       string
+	Redis           RedisConfig
 }
 
 type DatabaseConfig struct {
@@ -25,6 +26,13 @@ type DatabaseConfig struct {
 	Name           string
 	SSLMode        string
 	ChannelBinding string
+}
+
+type RedisConfig struct {
+	RedisHost     string
+	RedisPort     string
+	RedisPassword string
+	RedisDB       int
 }
 
 func Load() (*Config, error) {
@@ -47,7 +55,12 @@ func Load() (*Config, error) {
 		DBType:        getEnv("DB_TYPE", ""),
 		Port:          getEnv("PORT", "8000"),
 		JwtSecret:     getEnv("JWT_SECRET", ""),
-		RedisHost:     getEnv("REDIS_HOST", "localhost"),
+		Redis: RedisConfig{
+			RedisHost:     getEnv("REDIS_HOST", "localhost"),
+			RedisPort:     getEnv("REDIS_PORT", "6379"),
+			RedisPassword: getEnv("REDIS_PASSWORD", ""),
+			RedisDB:       getEnvInt("REDIS_DB", 0),
+		},
 	}
 
 	if cfg.JwtSecret == "" {
@@ -60,6 +73,20 @@ func Load() (*Config, error) {
 func getEnv(key, defaultVal string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
+	}
+
+	return defaultVal
+}
+
+func getEnvInt(key string, defaultVal int) int {
+	if val := os.Getenv(key); val != "" {
+		i, err := strconv.Atoi(val)
+		if err != nil {
+			log.Print("Error on loading env INT")
+			return defaultVal
+		}
+
+		return i
 	}
 
 	return defaultVal

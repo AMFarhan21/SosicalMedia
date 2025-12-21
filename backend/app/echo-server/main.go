@@ -35,9 +35,9 @@ func main() {
 	}
 
 	redis := redis.NewClient(&redis.Options{
-		Addr:     cfg.RedisHost + ":6379",
-		Password: "",
-		DB:       0,
+		Addr:     cfg.Redis.RedisHost + ":" + cfg.Redis.RedisPort,
+		Password: cfg.Redis.RedisPassword,
+		DB:       cfg.Redis.RedisDB,
 	})
 
 	// repo
