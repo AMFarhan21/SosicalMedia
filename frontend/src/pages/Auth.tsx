@@ -7,17 +7,23 @@ const Auth = () => {
     const [isLogin, setIsLogin] = useState(true)
 
     return (
-        <div className="w-full h-full left-10 flex absolute">
-            <div className="m-auto -mr-20">
-                <img src={xlogo} alt="App Logo" className='w-68' />
+        <div className="gap-20 w-full min-h-screen relative grid md:grid-cols-2 items-center justify-center m-auto flex-wrap">
+            <img src={xlogo} alt="App Logo" className='w-[60%] text-center items-center mx-auto' />
+            <div className="">
+                <div className="text-4xl sm:text-7xl font-bold mb-10">
+                    Happening now
+                </div>
+                <div className="text-2xl sm:text-4xl font-bold mb-10">
+                    Join today.
+                </div>
+                {
+                    isLogin ? (
+                        <Login setIsLogin={setIsLogin} />
+                    ) : (
+                        <Register setIsLogin={setIsLogin} />
+                    )
+                }
             </div>
-            {
-                isLogin ? (
-                    <Login setIsLogin={setIsLogin} />
-                ) : (
-                    <Register setIsLogin={setIsLogin} />
-                )
-            }
         </div>
     )
 }

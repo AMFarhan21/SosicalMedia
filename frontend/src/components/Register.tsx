@@ -16,44 +16,34 @@ const Register = ({ setIsLogin }: { setIsLogin: React.Dispatch<React.SetStateAct
         register(firstName, lastName, address, email, username, password, age)
     }
     return (
-        <div className="flex flex-col m-auto">
-            <div className="ml-8">
-                <div className="text-7xl font-bold mb-10">
-                    Happening now
+        <div className="w-full m-auto border border-white/25 rounded-2xl p-4">
+            <div className="text-center mb-4 font-bold text-2xl">Register</div>
+            <form className="space-y-4" onSubmit={handleRegisterSubmit}>
+                <div className='flex gap-2'>
+                    <input placeholder="First name" onChange={(e) => setFirstName(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
+                    <input placeholder="Last name" onChange={(e) => setLastName(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
                 </div>
-                <div className="text-4xl font-bold mb-10">
-                    Join today.
-                </div>
-            </div>
-            <div className="w-lg m-auto border border-white/25 rounded-2xl p-4">
-                <div className="text-center mb-4 font-bold text-2xl">Register</div>
-                <form className="space-y-4" onSubmit={handleRegisterSubmit}>
-                    <div className='flex gap-2'>
-                        <input placeholder="First name" onChange={(e) => setFirstName(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
-                        <input placeholder="Last name" onChange={(e) => setLastName(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
-                    </div>
-                    <input placeholder="Address" onChange={(e) => setAddress(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
-                    <input placeholder="Email" type="email" onChange={(e) => setEmail(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
-                    <input placeholder="Username" onChange={(e) => setUsername(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
-                    <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
-                    <input placeholder="Age" type='number' onChange={(e) => setAge(e.target.valueAsNumber)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
+                <input placeholder="Address" onChange={(e) => setAddress(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
+                <input placeholder="Email" type="email" onChange={(e) => setEmail(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
+                <input placeholder="Username" onChange={(e) => setUsername(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
+                <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
+                <input placeholder="Age" type='number' onChange={(e) => setAge(e.target.valueAsNumber)} className="w-full border border-white/25 rounded-lg px-4 py-2" />
+                {
+                    registerError && (
+                        <div className="text-red-500 text-sm text-center">
+                            {registerError}
+                        </div>
+                    )
+                }
+                <button disabled={registerLoading} type="submit" className="bg-white text-black w-full py-1 rounded-lg cursor-pointer hover:bg-gray-200 font-bold">
                     {
-                        registerError && (
-                            <div className="text-red-500 text-sm text-center">
-                                {registerError}
-                            </div>
-                        )
+                        registerLoading ? "Loading..." : "Register"
                     }
-                    <button disabled={registerLoading} type="submit" className="bg-white text-black w-full py-1 rounded-lg cursor-pointer hover:bg-gray-200 font-bold">
-                        {
-                            registerLoading ? "Loading..." : "Register"
-                        }
-                    </button>
+                </button>
 
-                </form>
-                <div className="text-gray-500 mt-4">
-                    Don't have an account? <button type="button" onClick={() => setIsLogin(true)} className="text-blue-500 cursor-pointer">Sign in</button>
-                </div>
+            </form>
+            <div className="text-gray-500 mt-4">
+                Don't have an account? <button type="button" onClick={() => setIsLogin(true)} className="text-blue-500 cursor-pointer">Sign in</button>
             </div>
         </div>
     )
