@@ -56,7 +56,7 @@ const PostComments = () => {
             {
                 img && (
                     <div className={`fixed inset-0 bg-black/80 z-51 items-center m-auto flex transition-opacity scale-100 duration-300 ${showImg ? "opacity-100" : "opacity-0"}`}>
-                        <img src={`${HOST}/${img}`} className={`max-h-full mx-auto transition-opacity scale-100 duration-300 ${showImg ? "scale-100" : "scale-0"}`} />
+                        <img loading="lazy" src={`${HOST}/${img}`} className={`max-h-full mx-auto transition-opacity scale-100 duration-300 ${showImg ? "scale-100" : "scale-0"}`} />
                         <div onClick={() => setImg("")} className='absolute top-10 right-10 cursor-pointer'>
                             <X />
                         </div>
