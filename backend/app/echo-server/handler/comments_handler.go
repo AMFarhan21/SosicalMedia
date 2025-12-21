@@ -90,8 +90,9 @@ func (h CommentsHandler) GetAllComments(e echo.Context) error {
 func (h CommentsHandler) GetCommentByID(e echo.Context) error {
 	strCommentID := e.Param("comment_id")
 	comment_id, _ := strconv.Atoi(strCommentID)
+	user_id := e.Get("id").(string)
 
-	comment, err := h.commentsService.GetCommentByID(int64(comment_id))
+	comment, err := h.commentsService.GetCommentByID(int64(comment_id), user_id)
 	if err != nil {
 		if strings.Contains(err.Error(), "found") {
 			log.Printf("Error on GetCommentByID request: %v", err.Error())

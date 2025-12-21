@@ -51,7 +51,7 @@ func (r *GormPostRepository) GetAllPost(page, limit int, user_id string) ([]doma
 		posts = append(posts, domain.PostsWithUsername{
 			ID:            row.ID,
 			UserID:        row.UserID,
-			FirstName:     row.Username,
+			FirstName:     row.FirstName,
 			LastName:      row.LastName,
 			Username:      row.Username,
 			Content:       row.Content,
@@ -72,7 +72,7 @@ func (r *GormPostRepository) GetPostByID(id int64, user_id string) (domain.Posts
 	err := r.DB.WithContext(r.ctx).
 		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at, exists(select 1 from likes where likes.post_id = posts.id and likes.user_id = ?) as is_liked, (select count(*) from likes where likes.post_id = posts.id) as likes_count, (select count(*) from comments where comments.post_id = posts.id) as comments_count", user_id).
 		Joins("JOIN users ON posts.user_id = users.id").
-		Where("posts.id=?", id).Scan(&row).Error
+		Where("posts.id=?", id).First(&row).Error
 	if err != nil {
 		return domain.PostsWithUsername{}, err
 	}

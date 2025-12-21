@@ -49,6 +49,7 @@ func (r *GormCommentsRepository) GetAllComments(post_id int64, user_id string) (
 		comments = append(comments, domain.CommentsWithUsername{
 			ID:         row.ID,
 			UserID:     row.UserID,
+			PostID:     row.PostID,
 			FirstName:  row.FirstName,
 			LastName:   row.LastName,
 			Username:   row.Username,
@@ -64,10 +65,12 @@ func (r *GormCommentsRepository) GetAllComments(post_id int64, user_id string) (
 	return comments, nil
 }
 
-{ini masalah kerjain}
-func (r *GormCommentsRepository) GetCommentByID(id int64) (domain.CommentsWithUsername, error) {
+func (r *GormCommentsRepository) GetCommentByID(id int64, user_id string) (domain.CommentsWithUsername, error) {
 	var row domain.CommentsFromDB
-	err := r.DB.WithContext(r.ctx).Where("id=?", id).First(&row).Error
+	err := r.DB.WithContext(r.ctx).
+		Select("comments.id, comments.user_id, comments.post_id, users.first_name, users.last_name, users.username, comments.content, comments.image_url, comments.created_at, comments.updated_at, exists(select 1 from likes where likes.comment_id = comments.id and likes.user_id = ?) as is_liked, (select count(*) from likes where likes.comment_id = comments.id) as likes_count", user_id).
+		Joins("JOIN users on comments.user_id = users.id").
+		Where("comments.id=?", id).First(&row).Error
 	if err != nil {
 		return domain.CommentsWithUsername{}, err
 	}
@@ -80,6 +83,7 @@ func (r *GormCommentsRepository) GetCommentByID(id int64) (domain.CommentsWithUs
 	return domain.CommentsWithUsername{
 		ID:         row.ID,
 		UserID:     row.UserID,
+		PostID:     row.PostID,
 		FirstName:  row.FirstName,
 		LastName:   row.LastName,
 		Username:   row.Username,
@@ -106,7 +110,7 @@ func (r *GormCommentsRepository) UpdateComment(data domain.Comments) error {
 }
 
 func (r *GormCommentsRepository) DeleteComment(id int64, user_id string) error {
-	comment, err := r.GetCommentByID(id)
+	comment, err := r.GetCommentByID(id, user_id)
 	if err != nil {
 		return err
 	}

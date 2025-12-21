@@ -40,7 +40,7 @@ const Comments = ({ post_id, username, comment, setComments }: { post_id: number
 
                     </div>
                 </div>
-                <button onClick={() => setOpen(true)} className='cursor-pointer hover:bg-gray-200 px-1 rounded-lg'>
+                <button onClick={() => setOpen(true)} className='cursor-pointer hover:bg-white/10 px-1 rounded-lg'>
                     <Ellipsis />
                 </button>
             </div>
@@ -87,7 +87,7 @@ const Comments = ({ post_id, username, comment, setComments }: { post_id: number
             </div>
             {
                 open && (
-                    <div className='bg-black border border-white/20 p-2 rounded-lg absolute right-0 top-10 -mr-10'>
+                    <div className='bg-black border border-white/10 p-2 rounded-lg absolute right-0 top-10 -mr-10'>
                         {
                             Me.id == comment.user_id ? (
                                 <>

@@ -14,6 +14,7 @@ type Config struct {
 	DBType          string
 	Port            string
 	JwtSecret       string
+	RedisHost       string
 }
 
 type DatabaseConfig struct {
@@ -46,6 +47,7 @@ func Load() (*Config, error) {
 		DBType:        getEnv("DB_TYPE", ""),
 		Port:          getEnv("PORT", "8000"),
 		JwtSecret:     getEnv("JWT_SECRET", ""),
+		RedisHost:     getEnv("REDIS_HOST", "localhost"),
 	}
 
 	if cfg.JwtSecret == "" {
