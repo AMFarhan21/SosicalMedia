@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"os"
 	"socialmedia/domain"
 
 	"gorm.io/gorm"
@@ -63,6 +64,7 @@ func (r *GormCommentsRepository) GetAllComments(post_id int64, user_id string) (
 	return comments, nil
 }
 
+{ini masalah kerjain}
 func (r *GormCommentsRepository) GetCommentByID(id int64) (domain.CommentsWithUsername, error) {
 	var row domain.CommentsFromDB
 	err := r.DB.WithContext(r.ctx).Where("id=?", id).First(&row).Error
@@ -104,6 +106,11 @@ func (r *GormCommentsRepository) UpdateComment(data domain.Comments) error {
 }
 
 func (r *GormCommentsRepository) DeleteComment(id int64, user_id string) error {
+	comment, err := r.GetCommentByID(id)
+	if err != nil {
+		return err
+	}
+
 	row := r.DB.WithContext(r.ctx).Where("id=?", id).Where("user_id=?", user_id).Delete(domain.Comments{})
 	if err := row.Error; err != nil {
 		return err
@@ -111,6 +118,10 @@ func (r *GormCommentsRepository) DeleteComment(id int64, user_id string) error {
 
 	if row.RowsAffected == 0 {
 		return errors.New("no rows affected, user doesnt exists")
+	}
+
+	for _, image := range comment.ImageUrl {
+		_ = os.Remove(image)
 	}
 
 	return nil

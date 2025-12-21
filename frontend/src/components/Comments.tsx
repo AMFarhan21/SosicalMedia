@@ -1,4 +1,4 @@
-import { Ellipsis, SquarePen, Trash } from 'lucide-react'
+import { Ellipsis, Trash } from 'lucide-react'
 
 import defaultProfile from '../assets/defaultProfile.jpg'
 
@@ -6,8 +6,10 @@ import { IoChatbubbleOutline, IoHeartOutline, IoHeartSharp } from 'react-icons/i
 import React, { useState } from 'react'
 import type { CommentsWithUsername } from '../hooks/useGetPostIDComments'
 import useLikes from '../hooks/useLikes'
+import useDeleteComments from '../hooks/useDeleteComments'
+import useGetMe from '../hooks/useGetMe'
 
-const Comments = ({ username, comment, setComments }: { username: string, comment: CommentsWithUsername, setComments: React.Dispatch<React.SetStateAction<CommentsWithUsername[]>> }) => {
+const Comments = ({ post_id, username, comment, setComments }: { post_id: number, username: string, comment: CommentsWithUsername, setComments: React.Dispatch<React.SetStateAction<CommentsWithUsername[]>> }) => {
 
     const [isLike, setIsLike] = useState(false)
     const [isComment, setIsComment] = useState(false)
@@ -16,6 +18,8 @@ const Comments = ({ username, comment, setComments }: { username: string, commen
     const HOST = import.meta.env.VITE_API_HOST
 
     const { likes } = useLikes({ setComments })
+    const { deleteComments } = useDeleteComments()
+    const { Me } = useGetMe()
 
 
     return (
@@ -83,27 +87,32 @@ const Comments = ({ username, comment, setComments }: { username: string, commen
             </div>
             {
                 open && (
-                    <div className='bg-white border p-2 rounded-lg absolute right-0 top-10 -mr-10'>
-                        <button onClick={async () => {
-                            // const success = awai(comment!.id)
-                            // if (!success) {
-                            //     alert(errorDelete)
-                            // } else {
-                            //     navigate(-1)
-                            // }
+                    <div className='bg-black border border-white/20 p-2 rounded-lg absolute right-0 top-10 -mr-10'>
+                        {
+                            Me.id == comment.user_id ? (
+                                <>
+                                    <button onClick={async (e) => {
+                                        e.preventDefault()
+                                        deleteComments(post_id, comment.id, setComments)
 
-                        }} className='flex gap-2 hover:bg-gray-200 px-2 rounded-sm w-full cursor-pointer text-red-500'>
-                            <Trash className='w-4' />
-                            <div>
-                                delete
-                            </div>
-                        </button>
-                        <button className='flex gap-2 hover:bg-gray-200 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
-                            <SquarePen className='w-4' />
-                            <div>
-                                edit
-                            </div>
-                        </button>
+                                    }} className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-red-500'>
+                                        <Trash className='w-4' />
+                                        <div>
+                                            delete
+                                        </div>
+                                    </button>
+
+                                </>
+                            ) : (
+                                <>
+                                    <button className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
+                                        <div>
+                                            (Work in Progress)
+                                        </div>
+                                    </button>
+                                </>
+                            )
+                        }
                     </div>
                 )
             }

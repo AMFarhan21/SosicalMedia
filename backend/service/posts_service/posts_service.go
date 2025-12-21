@@ -2,6 +2,7 @@ package posts_service
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 type PostsService struct {
 	postsRepo PostsRepo
+	redisRepo RedisRepo
 }
 
 type Service interface {
@@ -22,9 +24,10 @@ type Service interface {
 	DeletePost(id int64, user_id string) error
 }
 
-func NewPostsService(repo PostsRepo) Service {
+func NewPostsService(repo PostsRepo, redisRepo RedisRepo) Service {
 	return &PostsService{
 		postsRepo: repo,
+		redisRepo: redisRepo,
 	}
 }
 
@@ -62,10 +65,41 @@ func (s PostsService) CreatePost(data domain.Posts, files []*multipart.FileHeade
 
 	data.ImageUrl = string(imagesJson)
 
-	return s.postsRepo.CreatePost(data)
+	post, err := s.postsRepo.CreatePost(data)
+	if err != nil {
+		return domain.Posts{}, err
+	}
+
+	err = s.redisRepo.DeleteFeed()
+	if err != nil {
+		return domain.Posts{}, err
+	}
+
+	return post, nil
 }
 func (s PostsService) GetAllPost(page, limit int, user_id string) ([]domain.PostsWithUsername, error) {
-	return s.postsRepo.GetAllPost(page, limit, user_id)
+	resultRedis, err := s.redisRepo.GetAllPost(page, limit, user_id)
+	if err == nil {
+		fmt.Println("-----------------------------------------")
+		fmt.Println("THIS IS FROM REDIS")
+		return resultRedis, nil
+	}
+
+	fmt.Println("-----------------------------------------")
+	fmt.Println("CACHE MISSED -> QUERY DB")
+
+	resultDB, err := s.postsRepo.GetAllPost(page, limit, user_id)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("-----------------------------------------")
+	fmt.Println("THIS IS FROM DB")
+
+	fmt.Println("-----------------------------------------")
+	s.redisRepo.CacheGetAllPost(page, limit, user_id, resultDB)
+	fmt.Println("CACHED")
+
+	return resultDB, nil
 }
 func (s PostsService) GetPostByID(id int64, user_id string) (domain.PostsWithUsername, error) {
 	return s.postsRepo.GetPostByID(id, user_id)
@@ -75,5 +109,10 @@ func (s PostsService) UpdatePost(data domain.Posts) error {
 	return s.postsRepo.UpdatePost(data)
 }
 func (s PostsService) DeletePost(id int64, user_id string) error {
+	err := s.redisRepo.DeleteFeed()
+	if err != nil {
+		return err
+	}
+
 	return s.postsRepo.DeletePost(id, user_id)
 }

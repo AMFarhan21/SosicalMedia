@@ -7,10 +7,12 @@ const useLogin = () => {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
+    const HOST = import.meta.env.VITE_API_HOST
+
     const login = async (email: string, password: string) => {
         try {
             setLoading(true)
-            const res = await fetch("http://localhost:8000/api/v1/auth/login", {
+            const res = await fetch(`${HOST}/api/v1/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

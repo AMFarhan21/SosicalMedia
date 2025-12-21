@@ -9,6 +9,7 @@ const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
     const [errorCreate, setError] = useState("")
 
     const token = sessionStorage.getItem("Token")
+    const HOST = import.meta.env.VITE_API_HOST
 
     const createPost = async (content: string, files: File[]) => {
         try {
@@ -17,7 +18,7 @@ const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
             for (const file of files) {
                 formData.append("images", file)
             }
-            const resCreate = await fetch("http://localhost:8000/api/v1/posts", {
+            const resCreate = await fetch(`${HOST}/api/v1/posts`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -31,7 +32,7 @@ const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
                 throw new Error("Content should not be empty")
             }
 
-            const resGetID = await fetch(`http://localhost:8000/api/v1/posts/${resultCreate.data.id}`, {
+            const resGetID = await fetch(`${HOST}/api/v1/posts/${resultCreate.data.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

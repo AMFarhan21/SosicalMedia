@@ -15,18 +15,18 @@ const PostComments = () => {
     const [files, setFiles] = useState<File[]>([])
 
     const param = useParams()
-    const HOST = import.meta.env.VITE_API_URL
+    const HOST = import.meta.env.VITE_API_HOST
 
     const { post, setPost, comments, setComments, error } = useGetPostIDComments(Number(param.postID))
 
 
-    const { createComments, errorComments } = useCreateComments({ setComments })
+    const { createComments, errorComments } = useCreateComments()
 
 
     const handleCreateComment = (e: React.FormEvent) => {
         e.preventDefault()
         if (!post) return
-        createComments(post.id, commentInput, files)
+        createComments(post.id, commentInput, files, setComments)
         setCommentInput("")
         setFiles([])
     }
@@ -49,6 +49,8 @@ const PostComments = () => {
     }, [img])
 
 
+
+
     return (
         <>
             {
@@ -65,7 +67,7 @@ const PostComments = () => {
                 {
                     post && <Post post={post} setPost={setPost} idxCondition={true} postCommentsPage={() => { }} onPostComment={true} setImg={setImg} />
                 }
-                <form onSubmit={handleCreateComment} className={`sm:border-x ${comments.length == 0 && "border-b"} border-white/22 relative cursor-pointer p-4 flex flex-col space-y-4`}>
+                <form onSubmit={handleCreateComment} className={`sm:border-x ${!comments && "border-b"} border-white/22 relative cursor-pointer p-4 flex flex-col space-y-4`}>
                     <textarea value={commentInput} onChange={(e) => setCommentInput(e.target.value)} placeholder={`Reply to @${post.username}`} className="outline-none" />
                     <label htmlFor="upload-image">
                         <div className="cursor-pointer hover:bg-blue-400/20 duration-100 p-2 w-8 rounded-full -mb-6">
@@ -87,8 +89,8 @@ const PostComments = () => {
                 </form>
                 <div>
                     {
-                        comments.map((comment) => (
-                            <Comments username={post.username} comment={comment} setComments={setComments} />
+                        comments && comments.map((comment) => (
+                            <Comments post_id={post.id} username={post.username} comment={comment} setComments={setComments} />
                         ))
                     }
                 </div>

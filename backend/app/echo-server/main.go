@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"socialmedia/app/echo-server/handler"
 	"socialmedia/app/echo-server/router"
 	"socialmedia/repositories/comments_repository"
 	"socialmedia/repositories/likes_repository"
 	"socialmedia/repositories/posts_repository"
+	"socialmedia/repositories/redis_repository"
 	"socialmedia/repositories/users_repository"
 	"socialmedia/service/comments_service"
 	"socialmedia/service/likes_service"
@@ -15,6 +18,7 @@ import (
 	"socialmedia/utils/config"
 	"socialmedia/utils/database"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -30,11 +34,18 @@ func main() {
 		log.Fatalf("Error on get database connection %s", err)
 	}
 
+	redis := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
 	// repo
 	var userRepo users_service.UsersRepo
 	var postRepo posts_service.PostsRepo
 	var commentRepo comments_service.CommentsRepo
 	var likesRepo likes_service.LikesRepo
+	redisRepo := redis_repository.NewRedisRepository(redis)
 	switch cfg.DBType {
 	case "GORM":
 		userRepo = users_repository.NewGormUsersRepository(db.Gorm)
@@ -49,9 +60,11 @@ func main() {
 		// postRepo = posts_repository.NewRawPostRepository(db.Raw)
 	}
 
+	pong, err := redis.Ping(context.Background()).Result()
+	fmt.Println("REDIS PING:", pong, err)
 	// service
 	userService := users_service.NewUsersService(userRepo, cfg.JwtSecret)
-	postService := posts_service.NewPostsService(postRepo)
+	postService := posts_service.NewPostsService(postRepo, redisRepo)
 	commentService := comments_service.NewCommentsService(commentRepo)
 	likesService := likes_service.NewLikesService(likesRepo)
 

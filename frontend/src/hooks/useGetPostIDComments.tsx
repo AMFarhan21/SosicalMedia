@@ -88,7 +88,7 @@ const useGetPostIDComments = (postID: number) => {
 
         fetchPost()
         fetchComments()
-    }, [postID, token])
+    }, [postID, token, HOST])
 
 
 

@@ -1,4 +1,4 @@
-import { Ellipsis, SquarePen, Trash } from 'lucide-react'
+import { Ellipsis, Trash } from 'lucide-react'
 import { useState } from 'react'
 import useDeletePosts from '../hooks/useDeletePosts'
 import type { PostsWithUsername } from '../hooks/useGetAllPosts'
@@ -6,6 +6,7 @@ import defaultProfile from '../assets/defaultProfile.jpg'
 import { IoChatbubbleOutline, IoHeartOutline, IoHeartSharp } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
 import useLikes from '../hooks/useLikes'
+import useGetMe from '../hooks/useGetMe'
 
 
 const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostComment, setImg }: { post: PostsWithUsername, setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>, setPost?: React.Dispatch<React.SetStateAction<PostsWithUsername>>, idxCondition: boolean, postCommentsPage: () => void, onPostComment: boolean, setImg: React.Dispatch<React.SetStateAction<string>> }) => {
@@ -13,8 +14,9 @@ const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostC
     const [isComment, setIsComment] = useState(false)
     const [open, setOpen] = useState<number | null>(null)
     const HOST = import.meta.env.VITE_API_HOST;
-    const { deletePost, errorDelete } = useDeletePosts(setPosts)
+    const { deletePost } = useDeletePosts(setPosts)
     const { likes } = useLikes({ setPosts, setPost })
+    const { Me } = useGetMe()
 
     const navigate = useNavigate()
 
@@ -97,29 +99,35 @@ const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostC
                 </div>
                 {
                     open == post.id && (
-                        <div className='bg-white border p-2 rounded-lg absolute right-0 top-10 -mr-10'>
-                            <button onClick={async (e) => {
-                                e.stopPropagation()
-                                const success = await deletePost(post.id)
-                                if (!success) {
-                                    alert(errorDelete)
-                                }
+                        <div className='bg-black border border-white/50 p-2 rounded-lg absolute right-0 top-10 -mr-10'>
+                            {
+                                Me.id == post.user_id ? (
+                                    <>
+                                        <button onClick={async (e) => {
+                                            e.stopPropagation()
+                                            deletePost(post.id)
 
-                                if (onPostComment) {
-                                    navigate(-1)
-                                }
-                            }} className='flex gap-2 hover:bg-gray-200 px-2 rounded-sm w-full cursor-pointer text-red-500'>
-                                <Trash className='w-4' />
-                                <div>
-                                    delete
-                                </div>
-                            </button>
-                            <button className='flex gap-2 hover:bg-gray-200 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
-                                <SquarePen className='w-4' />
-                                <div>
-                                    edit
-                                </div>
-                            </button>
+                                            if (onPostComment) {
+                                                navigate(-1)
+                                            }
+                                        }} className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-red-500'>
+                                            <Trash className='w-4' />
+                                            <div>
+                                                delete
+                                            </div>
+                                        </button>
+
+                                    </>
+                                ) : (
+                                    <>
+                                        <button className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
+                                            <div>
+                                                (Work in Progress)
+                                            </div>
+                                        </button>
+                                    </>
+                                )
+                            }
                         </div>
                     )
                 }

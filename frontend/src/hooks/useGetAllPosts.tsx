@@ -19,9 +19,10 @@ const useGetAllPosts = () => {
     const [posts, setPosts] = useState<PostsWithUsername[]>([])
 
     const token = sessionStorage.getItem("Token")
+    const HOST = import.meta.env.VITE_API_HOST
 
     useEffect(() => {
-        fetch(`http://localhost:8000/api/v1/posts?page=1&limit=20`, {
+        fetch(`${HOST}/api/v1/posts?page=1&limit=20`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             }

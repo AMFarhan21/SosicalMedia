@@ -1,12 +1,12 @@
 import { useState } from "react"
 import type { CommentsWithUsername } from "./useGetPostIDComments"
 
-const useCreateComments = ({ setComments }: { setComments: React.Dispatch<React.SetStateAction<CommentsWithUsername[]>> }) => {
+const useCreateComments = () => {
     const [errorComments, setError] = useState("")
     const HOST = import.meta.env.VITE_API_HOST
     const token = sessionStorage.getItem("Token")
 
-    const createComments = async (post_id: number, content: string, files: File[]) => {
+    const createComments = async (post_id: number, content: string, files: File[], setComments: React.Dispatch<React.SetStateAction<CommentsWithUsername[]>>) => {
         try {
 
             const formData = new FormData()
@@ -37,7 +37,12 @@ const useCreateComments = ({ setComments }: { setComments: React.Dispatch<React.
                 throw new Error(resultGetByID.error)
             }
 
-            setComments((prev) => [resultGetByID.data, ...prev])
+            setComments((prev) => {
+                if (!prev) {
+                    return [resultGetByID.data]
+                }
+                return [resultGetByID.data, ...prev]
+            })
         } catch (err) {
             if (err instanceof Error) {
                 console.error(err.message)

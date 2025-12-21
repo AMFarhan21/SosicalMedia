@@ -9,3 +9,9 @@ type PostsRepo interface {
 	UpdatePost(data domain.Posts) error
 	DeletePost(id int64, user_id string) error
 }
+
+type RedisRepo interface {
+	GetAllPost(page, limit int, user_id string) ([]domain.PostsWithUsername, error)
+	CacheGetAllPost(page, limit int, user_id string, data []domain.PostsWithUsername)
+	DeleteFeed() error
+}

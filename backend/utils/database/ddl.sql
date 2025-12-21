@@ -14,7 +14,7 @@ create table users (
 
 create table posts (
     id serial primary key,
-    user_id varchar(255) references users(id) not null,
+    user_id  varchar(255) not null references users(id) on delete cascade,
     content text not null,
     image_url text,
     created_at timestamp set default now(),
@@ -23,8 +23,8 @@ create table posts (
 
 create table comments (
     id serial primary key,
-    user_id varchar(255) references users(id) not null,
-    post_id int references posts(id) not null,
+    user_id varchar(255) not null references users(id) on delete cascade,
+    post_id int not null  references posts(id) on delete cascade,
     content text not null,
     image_url text
     created_at timestamp set default now(),
@@ -33,8 +33,8 @@ create table comments (
 
 create table likes (
     id serial primary key,
-    user_id varchar(255) references users(id) not null,
-    post_id int references posts(id),
-    comment_id int references comments(id)
+    user_id varchar(255) not null references users(id) on delete cascade,
+    post_id int references posts(id) on delete cascade,
+    comment_id int references comments(id) on delete cascade
 );
 

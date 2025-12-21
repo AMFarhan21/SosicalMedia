@@ -6,6 +6,7 @@ const useRegister = () => {
     const [registerError, setError] = useState("")
     const [registerLoading, setLoading] = useState(false)
 
+    const HOST = import.meta.env.VITE_API_HOST
 
     const { login } = useLogin()
 
@@ -14,7 +15,7 @@ const useRegister = () => {
     const register = async (firstName: string, lastName: string, address: string, email: string, username: string, password: string, age: number) => {
         try {
             setLoading(true)
-            const res = await fetch("http://localhost:8000/api/v1/auth/register", {
+            const res = await fetch(`${HOST}/api/v1/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

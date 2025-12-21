@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"os"
 	"socialmedia/domain"
 
 	"gorm.io/gorm"
@@ -33,7 +34,6 @@ func (r *GormPostRepository) CreatePost(data domain.Posts) (domain.Posts, error)
 func (r *GormPostRepository) GetAllPost(page, limit int, user_id string) ([]domain.PostsWithUsername, error) {
 	var rows []domain.PostFromDB
 	err := r.DB.WithContext(r.ctx).
-		// Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at, exists(select * from likes where likes.post_id = posts.id and likes.user_id = ?) as is_liked", user_id).
 		Select("posts.id, posts.user_id, users.first_name, users.last_name, users.username, posts.content, posts.image_url, posts.created_at, posts.updated_at, exists(select 1 from likes where likes.post_id = posts.id and likes.user_id = ?) as is_liked, (select count(*) from likes where likes.post_id = posts.id) as likes_count, (select count(*) from comments where comments.post_id = posts.id) as comments_count", user_id).
 		Joins("JOIN users ON posts.user_id = users.id").
 		Order("posts.created_at DESC").Offset((page - 1) * limit).Limit(limit).Scan(&rows).Error
@@ -111,6 +111,11 @@ func (r *GormPostRepository) UpdatePost(data domain.Posts) error {
 }
 
 func (r *GormPostRepository) DeletePost(id int64, user_id string) error {
+	post, err := r.GetPostByID(id, user_id)
+	if err != nil {
+		return err
+	}
+
 	row := r.DB.WithContext(r.ctx).Where("id=?", id).Where("user_id=?", user_id).Delete(domain.Posts{})
 	if err := row.Error; err != nil {
 		return err
@@ -118,6 +123,10 @@ func (r *GormPostRepository) DeletePost(id int64, user_id string) error {
 
 	if row.RowsAffected == 0 {
 		return errors.New("no rows affected, user doesnt exists")
+	}
+
+	for _, image := range post.ImageUrl {
+		_ = os.Remove(image)
 	}
 
 	return nil

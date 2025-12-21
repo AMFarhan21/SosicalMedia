@@ -4,11 +4,12 @@ import type { PostsWithUsername } from './useGetAllPosts'
 const useDeletePosts = (setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>) => {
     const [errorDelete, setError] = useState("")
 
+    const HOST = import.meta.env.VITE_API_HOST
     const token = sessionStorage.getItem("Token")
 
     const deletePost = async (id: number) => {
         try {
-            const res = await fetch(`http://localhost:8000/api/v1/posts/${id}`, {
+            const res = await fetch(`${HOST}/api/v1/posts/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
