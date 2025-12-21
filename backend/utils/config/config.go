@@ -16,6 +16,7 @@ type Config struct {
 	Port            string
 	JwtSecret       string
 	Redis           RedisConfig
+	DeploymentURL   string
 }
 
 type DatabaseConfig struct {
@@ -61,6 +62,7 @@ func Load() (*Config, error) {
 			RedisPassword: getEnv("REDIS_PASSWORD", ""),
 			RedisDB:       getEnvInt("REDIS_DB", 0),
 		},
+		DeploymentURL: getEnv("DEPLOYMENT_URL", ""),
 	}
 
 	if cfg.JwtSecret == "" {

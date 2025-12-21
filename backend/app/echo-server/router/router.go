@@ -1,14 +1,19 @@
 package router
 
 import (
+	"log"
+	"net/http"
 	"socialmedia/app/echo-server/handler"
 	"socialmedia/app/echo-server/middleware"
 	"socialmedia/utils/config"
+	"time"
 
+	"github.com/AMFarhan21/fres"
 	"github.com/labstack/echo/v4"
+	"github.com/robfig/cron/v3"
 )
 
-func Router(e *echo.Echo, cfg *config.Config, userHandler *handler.UsersHandler, postHandler *handler.PostsHandler, commentHandler *handler.CommentsHandler, likesHandler *handler.LikesHandler) {
+func Router(e *echo.Echo, c *cron.Cron, cfg *config.Config, userHandler *handler.UsersHandler, postHandler *handler.PostsHandler, commentHandler *handler.CommentsHandler, likesHandler *handler.LikesHandler) {
 	jwtMiddleware := middleware.JWTMiddleware(cfg.JwtSecret)
 	adminAccess := middleware.ACLMiddleware(map[string]bool{
 		"admin": true,
@@ -24,6 +29,21 @@ func Router(e *echo.Echo, cfg *config.Config, userHandler *handler.UsersHandler,
 	})
 
 	api := e.Group("/api/v1")
+
+	c.AddFunc("*/10 * * * *", func() {
+		response, err := http.Get(cfg.DeploymentURL + "/health")
+		if err != nil {
+			log.Print("Ping failed", err.Error())
+			return
+		}
+
+		response.Body.Close()
+		log.Print("Pinged at", time.Now())
+	})
+
+	e.GET(cfg.DeploymentURL+"/health", func(e echo.Context) error {
+		return e.JSON(http.StatusOK, fres.Response.StatusOK("health ok"))
+	})
 
 	auth := api.Group("/auth")
 	auth.POST("/register", userHandler.RegisterNewUser)

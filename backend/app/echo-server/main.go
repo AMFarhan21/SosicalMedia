@@ -21,6 +21,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/robfig/cron/v3"
 )
 
 func main() {
@@ -79,7 +80,9 @@ func main() {
 	e.Use(middleware.CORS())
 	e.Static("/uploads", "uploads")
 
-	router.Router(e, cfg, userHandler, postHandler, commentHandler, likesHandler)
+	c := cron.New()
+
+	router.Router(e, c, cfg, userHandler, postHandler, commentHandler, likesHandler)
 
 	log.Println("Successfully connected to the server")
 
