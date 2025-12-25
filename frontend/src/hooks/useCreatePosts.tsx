@@ -7,12 +7,14 @@ interface CreatePostsResponse {
 
 const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>) => {
     const [errorCreate, setError] = useState("")
+    const [loadingCreatePost, setLoading] = useState(false)
 
-    const token = sessionStorage.getItem("Token")
+    const token = localStorage.getItem("Token")
     const HOST = import.meta.env.VITE_API_HOST
 
     const createPost = async (content: string, files: File[]) => {
         try {
+            setLoading(true)
             const formData = new FormData()
             formData.append("content", content)
             for (const file of files) {
@@ -49,10 +51,12 @@ const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
             } else {
                 setError("Error on creating post")
             }
+        } finally {
+            setLoading(false)
         }
     }
 
-    return { createPost, errorCreate }
+    return { createPost, errorCreate, loadingCreatePost }
 }
 
 export default useCreatePosts

@@ -5,7 +5,7 @@ const useDeletePosts = (setPosts?: React.Dispatch<React.SetStateAction<PostsWith
     const [errorDelete, setError] = useState("")
 
     const HOST = import.meta.env.VITE_API_HOST
-    const token = sessionStorage.getItem("Token")
+    const token = localStorage.getItem("Token")
 
     const deletePost = async (id: number) => {
         try {

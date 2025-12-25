@@ -34,13 +34,16 @@ const useGetPostIDComments = (postID: number) => {
     const [error, setError] = useState("")
     const [comments, setComments] = useState<CommentsWithUsername[]>([])
     const [post, setPost] = useState<PostsWithUsername>(initialPost)
-    const token = sessionStorage.getItem("Token")
+    const [loadingPost, setLoadingPost] = useState(false)
+    const [loadingComments, setLoadingComments] = useState(false)
+    const token = localStorage.getItem("Token")
     const HOST = import.meta.env.VITE_API_HOST
 
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
+                setLoadingPost(true)
                 const res = await fetch(`${HOST}/api/v1/posts/${postID}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -60,10 +63,13 @@ const useGetPostIDComments = (postID: number) => {
                 } else {
                     setError("Error on fetching post by id")
                 }
+            } finally {
+                setLoadingPost(false)
             }
         }
         const fetchComments = async () => {
             try {
+                setLoadingComments(true)
                 const res = await fetch(`${HOST}/api/v1/posts/${postID}/comments`, {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -83,6 +89,8 @@ const useGetPostIDComments = (postID: number) => {
                 } else {
                     setError("Error on fetching comments")
                 }
+            } finally {
+                setLoadingComments(false)
             }
         }
 
@@ -93,7 +101,7 @@ const useGetPostIDComments = (postID: number) => {
 
 
 
-    return { post, setPost, comments, setComments, error }
+    return { post, setPost, comments, setComments, error, loadingPost, loadingComments }
 
 }
 

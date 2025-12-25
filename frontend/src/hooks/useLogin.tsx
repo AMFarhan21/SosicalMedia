@@ -26,7 +26,7 @@ const useLogin = () => {
                 throw new Error(result.error || "Login failed")
             }
 
-            sessionStorage.setItem("Token", result.data)
+            localStorage.setItem("Token", result.data)
             navigate("/", { replace: true })
 
         } catch (err) {

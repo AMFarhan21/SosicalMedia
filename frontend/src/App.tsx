@@ -10,7 +10,7 @@ import PostComments from './pages/PostComments'
 function App() {
 
   const navigate = useNavigate()
-  const isLogin = sessionStorage.getItem("Token")
+  const isLogin = localStorage.getItem("Token")
 
 
   return (
@@ -29,7 +29,7 @@ function App() {
                   {
                     isLogin != "" ? (
                       <button onClick={() => {
-                        sessionStorage.removeItem("Token")
+                        localStorage.removeItem("Token")
                         navigate("/auth")
                       }} className='cursor-pointer flex gap-2 text-xl  hover:bg-white/12 duration-100 p-2 rounded-full'> <LogOut className='w-12' /> <span className='sm:hidden md:inline'>Logout</span> </button>
                     ) : (
@@ -46,7 +46,7 @@ function App() {
                   {
                     isLogin != "" ? (
                       <button onClick={() => {
-                        sessionStorage.removeItem("Token")
+                        localStorage.removeItem("Token")
                         navigate("/auth")
                       }} className='cursor-pointer flex gap-2 text-xl font-bold hover:bg-white/12 duration-100 p-2 rounded-full'> <LogOut className='w-12' /> </button>
                     ) : (

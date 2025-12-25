@@ -11,7 +11,8 @@ import useGetMe from '../hooks/useGetMe'
 
 const Comments = ({ post_id, username, comment, setComments }: { post_id: number, username: string, comment: CommentsWithUsername, setComments: React.Dispatch<React.SetStateAction<CommentsWithUsername[]>> }) => {
 
-    const [isLike, setIsLike] = useState(false)
+    const [isLiked, setIsLike] = useState(comment.is_liked)
+    const [likesCount, setLikesCount] = useState(comment.likes_count)
     const [isComment, setIsComment] = useState(false)
     const [open, setOpen] = useState(false)
 
@@ -86,13 +87,22 @@ const Comments = ({ post_id, username, comment, setComments }: { post_id: number
                         </span>
                     </div>
                 </button>
-                <button onClick={() => setIsLike(!isLike)} className='cursor-pointer'>
+                <button onClick={() => setIsLike(!isLiked)} className='cursor-pointer'>
                     <div className='flex gap-1 hover:text-pink-400 text-xs duration-200 items-center'>
-                        <button onClick={() => likes(comment.id, "COMMENT")} className='hover:bg-pink-300/20 rounded-full p-2 duration-200 cursor-pointer'>
-                            {comment.is_liked ? <IoHeartSharp className='w-4 h-4 text-pink-600' /> : <IoHeartOutline className='w-4 h-4' />}
+                        <button onClick={() => {
+                            likes(comment.id, "COMMENT")
+                            setLikesCount((prev) => {
+                                if (isLiked) {
+                                    return prev - 1
+                                } else {
+                                    return prev + 1
+                                }
+                            })
+                        }} className='hover:bg-pink-300/20 rounded-full p-2 duration-200 cursor-pointer'>
+                            {isLiked ? <IoHeartSharp className='w-4 h-4 text-pink-600' /> : <IoHeartOutline className='w-4 h-4' />}
                         </button>
                         <span className='-ml-1'>
-                            {comment.likes_count}
+                            {likesCount}
                         </span>
                     </div>
                 </button>

@@ -2,7 +2,7 @@ import type { PostsWithUsername } from './useGetAllPosts';
 import type { CommentsWithUsername } from './useGetPostIDComments';
 
 const useLikes = ({ setPosts, setPost, setComments }: { setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>, setPost?: React.Dispatch<React.SetStateAction<PostsWithUsername>>, setComments?: React.Dispatch<React.SetStateAction<CommentsWithUsername[]>> }) => {
-    const token = sessionStorage.getItem("Token")
+    const token = localStorage.getItem("Token")
     const HOST = import.meta.env.VITE_API_HOST;
 
     const likes = async (target_id: number, target: "POST" | "COMMENT") => {

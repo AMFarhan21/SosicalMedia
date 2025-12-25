@@ -2,7 +2,7 @@ import type { CommentsWithUsername } from "./useGetPostIDComments"
 
 const useDeleteComments = () => {
     const deleteComments = async (post_id: number, comment_id: number, setComments: React.Dispatch<React.SetStateAction<CommentsWithUsername[]>>) => {
-        const token = sessionStorage.getItem("Token")
+        const token = localStorage.getItem("Token")
         const HOST = import.meta.env.VITE_API_HOST
         try {
             const res = await fetch(`${HOST}/api/v1/posts/${post_id}/comments/${comment_id}`, {

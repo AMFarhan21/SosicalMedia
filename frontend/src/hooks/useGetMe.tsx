@@ -13,7 +13,7 @@ interface userProperties {
 
 const useGetMe = () => {
     const HOST = import.meta.env.VITE_API_HOST
-    const token = sessionStorage.getItem("Token")
+    const token = localStorage.getItem("Token")
     const [Me, setMe] = useState<userProperties>({
         "id": "",
         "first_name": "",

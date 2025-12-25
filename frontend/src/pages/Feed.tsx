@@ -4,6 +4,7 @@ import Posts from '../components/Post'
 import useGetAllPosts from '../hooks/useGetAllPosts'
 import { useNavigate } from 'react-router-dom'
 import { Image, X } from 'lucide-react'
+import LoadingSkeleton from '../components/LoadingSkeleton'
 
 
 const Feed = () => {
@@ -14,8 +15,8 @@ const Feed = () => {
 
     const HOST = import.meta.env.VITE_API_HOST
 
-    const { posts, setPosts } = useGetAllPosts()
-    const { createPost, errorCreate } = useCreatePosts(setPosts)
+    const { posts, setPosts, loadingGetAllPosts } = useGetAllPosts()
+    const { createPost, errorCreate, loadingCreatePost } = useCreatePosts(setPosts)
     const navigate = useNavigate()
 
     const handleCreatePost = async (e: React.FormEvent) => {
@@ -39,6 +40,7 @@ const Feed = () => {
         }
     }, [img, preview])
 
+
     return (
         <>
             {
@@ -58,6 +60,7 @@ const Feed = () => {
                     </div>
                 )
             }
+
             <div className='w-full sm:w-[56%] mx-auto'>
                 <div className='border-b sm:border border-white/22 font-bold text-lg text-center mx-auto p-3 backdrop-blur-sm sticky top-0 bg-black/80 z-50'>
                     For you
@@ -91,7 +94,7 @@ const Feed = () => {
                         e.target.value = ""
                     }} className='hidden' />
 
-                    <button type='submit' className='bg-white cursor-pointer text-black hover:bg-white/80 duration-100 font-bold w-20 rounded-full absolute right-4 bottom-0 p-1'>
+                    <button type='submit' disabled={loadingCreatePost} className={` bg-white ${loadingCreatePost ? "bg-white/50 hover:bg-white/50" : "hover:bg-white/80 "} cursor-pointer text-black duration-100 font-bold w-20 rounded-full absolute right-4 bottom-0 p-1`}>
                         Post
                     </button>
 
@@ -99,16 +102,26 @@ const Feed = () => {
                         {errorCreate}
                     </div>
                 </form>
-                <div className=''>
-                    {
-                        posts.map((post, index) => {
-                            const idxCondition = index == posts.length - 1
-                            return (
-                                <Posts post={post} setPosts={setPosts} idxCondition={idxCondition} postCommentsPage={() => navigate(`/${post.id}/comments`)} onPostComment={false} setImg={setImg} />
-                            )
-                        })
-                    }
-                </div>
+                {
+                    loadingGetAllPosts ? (
+                        [1, 2, 3, 4, 5].map(() => (
+                            <div className="border border-white/22 p-2">
+                                <LoadingSkeleton />
+                            </div>
+                        ))
+                    ) : (
+                        <div className=''>
+                            {
+                                posts.map((post, index) => {
+                                    const idxCondition = index == posts.length - 1
+                                    return (
+                                        <Posts post={post} setPosts={setPosts} idxCondition={idxCondition} postCommentsPage={() => navigate(`/${post.id}/comments`)} onPostComment={false} setImg={setImg} />
+                                    )
+                                })
+                            }
+                        </div>
+                    )
+                }
             </div>
         </>
     )

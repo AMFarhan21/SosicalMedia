@@ -17,22 +17,36 @@ export interface PostsWithUsername {
 
 const useGetAllPosts = () => {
     const [posts, setPosts] = useState<PostsWithUsername[]>([])
-
-    const token = sessionStorage.getItem("Token")
+    const [loadingGetAllPosts, setLoading] = useState(false)
+    const token = localStorage.getItem("Token")
     const HOST = import.meta.env.VITE_API_HOST
 
     useEffect(() => {
-        fetch(`${HOST}/api/v1/posts?page=1&limit=20`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
+        const fetchAllPost = async () => {
+            try {
+                setLoading(true)
+                await new Promise(res => setTimeout(res, 1500)) // TEST
+                const res = await fetch(`${HOST}/api/v1/posts?page=1&limit=20`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
+                const result = await res.json()
+                if (!res.ok) {
+                    throw new Error(result.error)
+                }
+                setPosts(result.data)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setLoading(false)
             }
-        })
-            .then(res => res.json())
-            .then(result => setPosts(result.data))
-            .catch(err => console.error(err))
-    }, [])
+        }
 
-    return { posts, setPosts }
+        fetchAllPost()
+    }, [token, HOST])
+
+    return { posts, setPosts, loadingGetAllPosts }
 }
 
 
