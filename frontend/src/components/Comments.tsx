@@ -3,7 +3,7 @@ import { Ellipsis, Trash } from 'lucide-react'
 import defaultProfile from '../assets/defaultProfile.jpg'
 
 import { IoChatbubbleOutline, IoHeartOutline, IoHeartSharp } from 'react-icons/io5'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import type { CommentsWithUsername } from '../hooks/useGetPostIDComments'
 import useLikes from '../hooks/useLikes'
 import useDeleteComments from '../hooks/useDeleteComments'
@@ -21,6 +21,19 @@ const Comments = ({ post_id, username, comment, setComments }: { post_id: number
     const { deleteComments } = useDeleteComments()
     const { Me } = useGetMe()
 
+    const menuRef = useRef<HTMLDivElement | null>(null)
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setOpen(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [])
 
     return (
         <div className={`border-t p-4 sm:border-l sm:border-r border-b border-white/22 cursor-pointer relative`} key={comment?.id}>
@@ -87,7 +100,7 @@ const Comments = ({ post_id, username, comment, setComments }: { post_id: number
             </div>
             {
                 open && (
-                    <div className='bg-black border border-white/10 p-2 rounded-lg absolute right-0 top-10 -mr-10'>
+                    <div ref={menuRef} className='bg-black border border-white/20 p-1 rounded-lg absolute right-0 top-10'>
                         {
                             Me.id == comment.user_id ? (
                                 <>
@@ -95,7 +108,7 @@ const Comments = ({ post_id, username, comment, setComments }: { post_id: number
                                         e.preventDefault()
                                         deleteComments(post_id, comment.id, setComments)
 
-                                    }} className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-red-500'>
+                                    }} className='flex gap-2 hover:bg-white/10 px-2 rounded-sm w-full cursor-pointer text-red-500'>
                                         <Trash className='w-4' />
                                         <div>
                                             delete
@@ -105,7 +118,7 @@ const Comments = ({ post_id, username, comment, setComments }: { post_id: number
                                 </>
                             ) : (
                                 <>
-                                    <button className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
+                                    <button className='flex gap-2 hover:bg-white/10 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
                                         <div>
                                             (Work in Progress)
                                         </div>

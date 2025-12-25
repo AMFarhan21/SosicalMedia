@@ -1,5 +1,5 @@
 import { Ellipsis, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useDeletePosts from '../hooks/useDeletePosts'
 import type { PostsWithUsername } from '../hooks/useGetAllPosts'
 import defaultProfile from '../assets/defaultProfile.jpg'
@@ -10,7 +10,8 @@ import useGetMe from '../hooks/useGetMe'
 
 
 const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostComment, setImg }: { post: PostsWithUsername, setPosts?: React.Dispatch<React.SetStateAction<PostsWithUsername[]>>, setPost?: React.Dispatch<React.SetStateAction<PostsWithUsername>>, idxCondition: boolean, postCommentsPage: () => void, onPostComment: boolean, setImg: React.Dispatch<React.SetStateAction<string>> }) => {
-    const [isLike, setIsLike] = useState(false)
+    const [isLike, setIsLike] = useState(post.is_liked)
+    const [likesCount, setLikesCount] = useState(post.likes_count)
     const [isComment, setIsComment] = useState(false)
     const [open, setOpen] = useState<number | null>(null)
     const HOST = import.meta.env.VITE_API_HOST;
@@ -19,6 +20,20 @@ const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostC
     const { Me } = useGetMe()
 
     const navigate = useNavigate()
+
+    const menuRef = useRef<HTMLDivElement | null>(null)
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setOpen(null)
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [])
 
     return (
         <>
@@ -85,13 +100,20 @@ const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostC
                     <button onClick={(e) => {
                         e.stopPropagation()
                         setIsLike(!isLike)
+                        setLikesCount((prev) => {
+                            if (isLike) {
+                                return prev - 1
+                            } else {
+                                return prev + 1
+                            }
+                        })
                     }} className='cursor-pointer'>
                         <div className='flex gap-1 hover:text-pink-400 text-xs duration-200 items-center'>
                             <button onClick={() => likes(post.id, "POST")} className='hover:bg-pink-300/20 rounded-full p-2 duration-200 cursor-pointer'>
-                                {post.is_liked ? <IoHeartSharp className='w-4 h-4 text-pink-600' /> : <IoHeartOutline className='w-4 h-4' />}
+                                {isLike ? <IoHeartSharp className='w-4 h-4 text-pink-600' /> : <IoHeartOutline className='w-4 h-4' />}
                             </button>
                             <span className='-ml-1'>
-                                {post.likes_count}
+                                {likesCount}
                             </span>
                         </div>
                     </button>
@@ -99,7 +121,7 @@ const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostC
                 </div>
                 {
                     open == post.id && (
-                        <div className='bg-black border border-white/50 p-2 rounded-lg absolute right-0 top-10 -mr-10'>
+                        <div ref={menuRef} className='bg-black border border-white/30 p-1 rounded-lg absolute right-0 top-10'>
                             {
                                 Me.id == post.user_id ? (
                                     <>
@@ -110,7 +132,7 @@ const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostC
                                             if (onPostComment) {
                                                 navigate(-1)
                                             }
-                                        }} className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-red-500'>
+                                        }} className='flex gap-2 hover:bg-white/10 px-2 rounded-sm w-full cursor-pointer text-red-500'>
                                             <Trash className='w-4' />
                                             <div>
                                                 delete
@@ -120,7 +142,7 @@ const Post = ({ post, setPosts, setPost, idxCondition, postCommentsPage, onPostC
                                     </>
                                 ) : (
                                     <>
-                                        <button className='flex gap-2 hover:bg-white/20 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
+                                        <button className='flex gap-2 hover:bg-white/10 px-2 rounded-sm w-full cursor-pointer text-blue-400'>
                                             <div>
                                                 (Work in Progress)
                                             </div>

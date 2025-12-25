@@ -38,3 +38,12 @@ create table likes (
     comment_id int references comments(id) on delete cascade
 );
 
+create index idx_users_username on users(username)
+create index idx_posts_user_id on posts(user_id)
+create index idx_posts_created_at on posts(created_at desc)
+create index idx_comments_post_id on comments(post_id)
+create index idx_comments_user_id on comments(user_id)
+create index idx_comments_created_at on comments(created_at desc)
+create index idx_likes_user_id on likes(user_id)
+create index idx_likes_post_id on likes(post_id)
+create index idx_likes_comment_id on likes(comment_id)

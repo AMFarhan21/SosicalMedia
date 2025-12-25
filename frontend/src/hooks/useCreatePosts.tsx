@@ -42,6 +42,7 @@ const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
 
             setPosts(prev => [resultGetID.data, ...prev])
             setError("")
+            return true
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message)

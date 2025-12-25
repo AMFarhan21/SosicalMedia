@@ -10,6 +10,7 @@ const Feed = () => {
     const [content, setContent] = useState("")
     const [files, setFiles] = useState<File[]>([])
     const [img, setImg] = useState("")
+    const [preview, setPreview] = useState("")
 
     const HOST = import.meta.env.VITE_API_HOST
 
@@ -17,34 +18,41 @@ const Feed = () => {
     const { createPost, errorCreate } = useCreatePosts(setPosts)
     const navigate = useNavigate()
 
-    const handleCreatePost = (e: React.FormEvent) => {
+    const handleCreatePost = async (e: React.FormEvent) => {
         e.preventDefault()
-        createPost(content, files)
-
-
-        setContent("")
-        setFiles([])
+        const res = await createPost(content, files)
+        if (res) {
+            setContent("")
+            setFiles([])
+        }
     }
 
     const [showImg, setShowImg] = useState(false)
 
     useEffect(() => {
-        if (img) {
+        if (img || preview) {
             const timer = setTimeout(() => setShowImg(true), 10)
             return () => clearTimeout(timer)
         } else {
             const timer = setTimeout(() => setShowImg(false), 10)
             return () => clearTimeout(timer)
         }
-    }, [img])
+    }, [img, preview])
 
     return (
         <>
             {
-                img && (
+                img ? (
                     <div className={`fixed inset-0 bg-black/80 z-51 items-center m-auto flex transition-opacity scale-100 duration-300 ${showImg ? "opacity-100" : "opacity-0"}`}>
                         <img loading='lazy' src={`${HOST}/${img}`} className={`max-h-full mx-auto transition-opacity scale-100 duration-300 ${showImg ? "scale-100" : "scale-0"}`} />
-                        <div onClick={() => setImg("")} className='absolute top-10 right-10 cursor-pointer'>
+                        <div onClick={() => setImg("")} className='absolute top-10 right-10 cursor-pointer bg-black/50 rounded-full p-1 m-1 hover:bg-black/70'>
+                            <X />
+                        </div>
+                    </div>
+                ) : preview && (
+                    <div className={`fixed inset-0 bg-black/80 z-51 items-center m-auto flex transition-opacity scale-100 duration-300 ${showImg ? "opacity-100" : "opacity-0"}`}>
+                        <img loading='lazy' src={preview} className={`max-h-full mx-auto transition-opacity scale-100 duration-300 ${showImg ? "scale-100" : "scale-0"}`} />
+                        <div onClick={() => setPreview("")} className='absolute top-10 right-10 cursor-pointer bg-black/50 rounded-full p-1 m-1 hover:bg-black/70'>
                             <X />
                         </div>
                     </div>
@@ -60,6 +68,18 @@ const Feed = () => {
                 </div>
                 <form onSubmit={handleCreatePost} className={`sm:border-x ${posts.length == 0 && "border-b"} border-white/22 relative cursor-pointer p-4 flex flex-col space-y-4`}>
                     <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="What's happening?" className='border-none outline-none' rows={2} />
+                    <div className='flex flex-wrap'>
+                        {
+                            files && files.map((file, index) => (
+                                <div key={index} className='relative w-[50%]'>
+                                    <button type='button' className='absolute right-0 bg-black/50 rounded-full p-1 m-1 cursor-pointer hover:bg-black/70' onClick={() => setFiles((prev) => prev.filter((_, i) => i != index))}>
+                                        <X className='' />
+                                    </button>
+                                    <img onClick={() => setPreview(URL.createObjectURL(file))} src={URL.createObjectURL(file)} className='' />
+                                </div>
+                            ))
+                        }
+                    </div>
                     <label htmlFor='upload-image'>
                         <div className='p-2 w-8 -mb-6 cursor-pointer hover:bg-blue-400/20 rounded-full text-blue-400 duration-100'>
                             <Image className='w-4 h-4' />
@@ -68,10 +88,13 @@ const Feed = () => {
                     <input id='upload-image' type='file' multiple accept='image/*' onChange={(e) => {
                         if (!e.target.files) return
                         setFiles(Array.from(e.target.files))
+                        e.target.value = ""
                     }} className='hidden' />
+
                     <button type='submit' className='bg-white cursor-pointer text-black hover:bg-white/80 duration-100 font-bold w-20 rounded-full absolute right-4 bottom-0 p-1'>
                         Post
                     </button>
+
                     <div className='text-sm text-red-500'>
                         {errorCreate}
                     </div>
