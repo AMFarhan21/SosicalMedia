@@ -20,11 +20,11 @@ type (
 	}
 
 	CreatePostInput struct {
-		Content string `form:"content" validate:"required"`
+		Content string `form:"content"`
 	}
 
 	UpdatePostInput struct {
-		Content string `json:"content" bson:"content" validate:"required"`
+		Content string `json:"content" bson:"content"`
 	}
 )
 

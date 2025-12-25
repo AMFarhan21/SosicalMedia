@@ -15,6 +15,7 @@ const PostComments = () => {
     const [showImg, setShowImg] = useState(false)
     const [preview, setPreview] = useState("")
     const [files, setFiles] = useState<File[]>([])
+    const [errorMessage, setErrorMessage] = useState("")
 
     const param = useParams()
     const HOST = import.meta.env.VITE_API_HOST
@@ -28,11 +29,21 @@ const PostComments = () => {
     const handleCreateComment = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!post) return
-        const res = await createComments(post.id, commentInput, files, setComments)
-        if (res) {
-            setCommentInput("")
-            setFiles([])
+
+
+        if (commentInput.trim() == "" && files.length == 0) {
+            setErrorMessage("Your reply is empty")
+            return
         }
+
+
+        const res = await createComments(post.id, commentInput, files, setComments)
+        if (!res) {
+            return
+        }
+
+        setCommentInput("")
+        setFiles([])
     }
 
 
@@ -111,8 +122,8 @@ const PostComments = () => {
                     <button disabled={loadingCreateComment} className={`cursor-pointer absolute right-4 bottom-4 bg-white ${loadingCreateComment ? "bg-white/50 hover:bg-white/50" : "hover:bg-white/80"} cursor-pointer text-black font-bold px-4 py-1 cursor-pointerduration-100 rounded-full`} type="submit">
                         Reply
                     </button>
-                    <div className='text-sm text-red-500'>
-                        {errorComments}
+                    <div className='text-sm text-red-500 mt-4 ml-2'>
+                        {errorComments ? errorComments : errorMessage}
                     </div>
                 </form>
                 <div>

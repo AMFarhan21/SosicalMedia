@@ -20,11 +20,11 @@ type (
 	}
 
 	CreateCommentInput struct {
-		Content string `form:"content" validate:"required"`
+		Content string `form:"content"`
 	}
 
 	UpdateCommentInput struct {
-		Content string `json:"content" bson:"content" validate:"required"`
+		Content string `json:"content" bson:"content"`
 	}
 )
 

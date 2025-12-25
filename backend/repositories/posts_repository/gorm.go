@@ -126,7 +126,9 @@ func (r *GormPostRepository) DeletePost(id int64, user_id string) error {
 	}
 
 	for _, image := range post.ImageUrl {
-		_ = os.Remove(image)
+		go func(img string) {
+			_ = os.Remove(image)
+		}(image)
 	}
 
 	return nil

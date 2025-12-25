@@ -12,6 +12,7 @@ const Feed = () => {
     const [files, setFiles] = useState<File[]>([])
     const [img, setImg] = useState("")
     const [preview, setPreview] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
 
     const HOST = import.meta.env.VITE_API_HOST
 
@@ -21,11 +22,20 @@ const Feed = () => {
 
     const handleCreatePost = async (e: React.FormEvent) => {
         e.preventDefault()
-        const res = await createPost(content, files)
-        if (res) {
-            setContent("")
-            setFiles([])
+
+        if (content.trim() == "" && files.length == 0) {
+            setErrorMessage("Your post is empty")
+            return
         }
+
+        setErrorMessage("")
+
+        const res = await createPost(content, files)
+        if (!res) {
+            return
+        }
+        setContent("")
+        setFiles([])
     }
 
     const [showImg, setShowImg] = useState(false)
@@ -98,8 +108,8 @@ const Feed = () => {
                         Post
                     </button>
 
-                    <div className='text-sm text-red-500'>
-                        {errorCreate}
+                    <div className='text-sm text-red-500 mt-4 ml-2'>
+                        {errorCreate ? errorCreate : errorMessage}
                     </div>
                 </form>
                 {
