@@ -25,7 +25,7 @@ const useCreateComments = () => {
             })
             const resultCreate = await resCreate.json()
             if (!resCreate.ok) {
-                throw new Error("Content should not be empty")
+                throw new Error(resultCreate.error)
             }
 
             const resGetByID = await fetch(`${HOST}/api/v1/posts/${post_id}/comments/${resultCreate.data.id}`, {

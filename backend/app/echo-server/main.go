@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"socialmedia/app/echo-server/handler"
 	"socialmedia/app/echo-server/router"
 	"socialmedia/repositories/comments_repository"
@@ -76,6 +77,10 @@ func main() {
 	likesHandler := handler.NewLikesHandler(likesService)
 
 	e := echo.New()
+
+	if err := os.Mkdir("uploads", 0755); err != nil {
+		log.Print("failed create uploads dir: %v", err)
+	}
 
 	e.Use(middleware.CORS())
 	e.Static("/uploads", "uploads")

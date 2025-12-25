@@ -31,7 +31,7 @@ const useCreatePosts = (setPosts: React.Dispatch<React.SetStateAction<PostsWithU
             const resultCreate = await resCreate.json()
 
             if (!resCreate.ok) {
-                throw new Error("Content should not be empty")
+                throw new Error(resultCreate.error)
             }
 
             const resGetID = await fetch(`${HOST}/api/v1/posts/${resultCreate.data.id}`, {
