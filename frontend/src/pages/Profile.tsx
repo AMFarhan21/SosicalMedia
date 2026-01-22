@@ -1,4 +1,3 @@
-import { useState } from "react"
 import useGetMe from "../hooks/useGetMe"
 
 const Profile = () => {
