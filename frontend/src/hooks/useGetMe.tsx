@@ -24,10 +24,13 @@ const useGetMe = () => {
         "age": 0,
         "role": "",
     })
+    const [errorGetMe, setError] = useState("")
+    const [loadingGetMe, setLoading] = useState(false)
 
     useEffect(() => {
         const getMe = async () => {
             try {
+                setLoading(true)
                 const res = await fetch(`${HOST}/api/v1/users`, {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -35,19 +38,28 @@ const useGetMe = () => {
                 })
                 const result = await res.json()
                 if (!res.ok) {
+                    if (res.status == 401 || res.status == 403) {
+                        throw new Error("UNAUTHORIZED")
+                    }
+
                     throw new Error(result.err)
                 }
 
                 setMe(result.data)
             } catch (err) {
                 console.error(err)
+                if (err instanceof Error) {
+                    setError(err.message)
+                }
+            } finally {
+                setLoading(false)
             }
         }
 
         getMe()
     }, [HOST, token])
 
-    return { Me }
+    return { Me, errorGetMe, loadingGetMe }
 }
 
 export default useGetMe

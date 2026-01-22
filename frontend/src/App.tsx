@@ -6,11 +6,15 @@ import ProtectedRoutes from './components/ProtectedRoutes'
 import { House, LogIn, LogOut, Search, User } from 'lucide-react'
 import xlogo from './assets/x2.png'
 import PostComments from './pages/PostComments'
+import useGetMe from './hooks/useGetMe'
+import Profile from './pages/Profile'
 
 function App() {
 
   const navigate = useNavigate()
   const isLogin = localStorage.getItem("Token")
+
+  const { Me } = useGetMe()
 
 
   return (
@@ -24,7 +28,7 @@ function App() {
                 <Link to={"/"} className='w-15 hover:bg-white/12 duration-100 p-4 rounded-full ml-1'> <img src={xlogo} alt="App Logo" className='' /> </Link>
                 <Link to={"/"} className='flex gap-2 text-xl  items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <House className='w-12' /> <span className='sm:hidden md:inline'>Home</span> </Link>
                 <Link to={"/"} className='flex gap-2 text-xl  items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <Search className='w-12' /> <span className='sm:hidden md:inline'>Search</span> </Link>
-                <Link to={"/"} className='flex gap-2 text-xl  items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <User className='w-12' /> <span className='sm:hidden md:inline'>Profile</span> </Link>
+                <Link to={`/${Me.username}/${Me.id}`} className='flex gap-2 text-xl  items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <User className='w-12' /> <span className='sm:hidden md:inline'>Profile</span> </Link>
                 <div className='space-x-4 bottom-0'>
                   {
                     isLogin != "" ? (
@@ -41,7 +45,7 @@ function App() {
               <div className='flex sm:hidden justify-around fixed bottom-0 bg-black w-full p-2 z-50'>
                 <Link to={"/"} className='flex gap-2 text-xl font-bold items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <House className='w-12' /> </Link>
                 <Link to={"/"} className='flex gap-2 text-xl font-bold items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <Search className='w-12' /> </Link>
-                <Link to={"/"} className='flex gap-2 text-xl font-bold items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <User className='w-12' /> </Link>
+                <Link to={`/${Me.username}/${Me.id}`} className='flex gap-2 text-xl font-bold items-center hover:bg-white/12 duration-100 p-2 rounded-full'> <User className='w-12' /> </Link>
                 <div className='space-x-4'>
                   {
                     isLogin != "" ? (
@@ -72,6 +76,11 @@ function App() {
               <PostComments />
             </ProtectedRoutes>
           } />
+          <Route path="/:username/:userID" element={
+            <ProtectedRoutes>
+              <Profile />
+            </ProtectedRoutes>
+          }></Route>
         </Routes >
       </div>
     </div>

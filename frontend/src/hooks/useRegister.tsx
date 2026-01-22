@@ -12,7 +12,7 @@ const useRegister = () => {
 
     const navigate = useNavigate()
 
-    const register = async (firstName: string, lastName: string, address: string, email: string, username: string, password: string, age: number) => {
+    const register = async (firstName: string, lastName: string, email: string, username: string, password: string) => {
         try {
             setLoading(true)
             const res = await fetch(`${HOST}/api/v1/auth/register`, {
@@ -20,7 +20,7 @@ const useRegister = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ first_name: firstName, last_name: lastName, address, email, username, password, age })
+                body: JSON.stringify({ first_name: firstName, last_name: lastName, email, username, password })
             })
 
             const result = await res.json()

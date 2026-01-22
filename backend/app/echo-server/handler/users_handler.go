@@ -21,11 +21,11 @@ type (
 	RegisterInput struct {
 		FirstName string `json:"first_name" bson:"first_name" validate:"required,min=4"`
 		LastName  string `json:"last_name" bson:"last_name"`
-		Address   string `json:"address" bson:"address" validate:"required,min=4"`
+		Address   string `json:"address" bson:"address"`
 		Email     string `json:"email" bson:"email" validate:"required,email"`
 		Username  string `json:"username" bson:"username" validate:"required,min=4"`
 		Password  string `json:"password" bson:"password" validate:"required,min=4"`
-		Age       int    `json:"age" bson:"age" validate:"required,min=12"`
+		Age       int    `json:"age" bson:"age"`
 	}
 
 	LoginInput struct {
